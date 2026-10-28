@@ -1,103 +1,134 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useEffect, useState } from 'react';
+import { CalendarCheck, Camera, Scales } from '@phosphor-icons/react';
+import { Disclaimer } from '@/components/Disclaimer';
+import { TrialCard } from '@/components/TrialCard';
+import { Button, ButtonLink, PageHeader } from '@/components/ui';
+import { VerdictChip } from '@/components/VerdictChip';
+import { listScans, listTrials } from '@/lib/store/db';
+import { activeTrials, nextCheckIn, scansForTrial } from '@/lib/trials/view';
+import { computeVerdict } from '@/lib/verdict/engine';
+import type { Scan, Trial } from '@/lib/verdict/types';
+
+const STEPS = [
+  { icon: Camera, title: 'Scan a baseline', body: 'One selfie when you start a product.' },
+  { icon: CalendarCheck, title: 'Check in weekly', body: 'A quick scan each week, same light.' },
+  { icon: Scales, title: 'Get a verdict', body: 'Keep going, give it time, or stop.' },
+];
+
+function EmptyShelf() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <section className="animate-rise">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary">Skincare, judged by your skin</p>
+      <h1 className="font-serif text-[2.4rem] leading-[1.08] font-semibold text-balance">
+        Is your skincare actually working?
+      </h1>
+      <p className="mt-3 text-base leading-relaxed text-ink-muted">
+        Verdict measures the concern a product promises to fix, scan after scan, and tells you when the change is real —
+        or when to stop paying for it.
+      </p>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <figure className="mt-6 rounded-2xl bg-surface p-4 shadow-lift ring-1 ring-line/70" aria-label="Example verdict">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="font-serif text-lg font-semibold">Niacinamide serum</p>
+            <p className="text-sm text-ink-muted">Oiliness · Pores</p>
+          </div>
+          <VerdictChip kind="working" />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <figcaption className="mt-3 border-t border-line pt-3 text-sm leading-relaxed">
+          Oiliness improved 6 pts in 5 weeks, above normal scan noise (±3). Keep going.
+          <span className="ml-1 text-xs text-ink-muted">— example</span>
+        </figcaption>
+      </figure>
+
+      <ol className="mt-8 space-y-3">
+        {STEPS.map(({ icon: Glyph, title, body }, i) => (
+          <li key={title} className="flex items-center gap-4">
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
+              <Glyph aria-hidden size={22} weight="duotone" />
+            </span>
+            <div>
+              <p className="font-semibold">
+                <span className="sr-only">Step {i + 1}: </span>
+                {title}
+              </p>
+              <p className="text-sm text-ink-muted">{body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <div className="mt-8 space-y-3">
+        <ButtonLink href="/trial/new" className="w-full">
+          Start a trial
+        </ButtonLink>
+        <Button variant="secondary" className="w-full" disabled>
+          View sample journey
+        </Button>
+      </div>
+      <Disclaimer />
+    </section>
+  );
+}
+
+function ShelfSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Loading your shelf" className="space-y-4 pt-2">
+      <div className="h-9 w-2/3 animate-pulse rounded-lg bg-muted" />
+      {[0, 1].map(i => (
+        <div key={i} className="h-36 animate-pulse rounded-2xl bg-muted" />
+      ))}
     </div>
+  );
+}
+
+export default function ShelfPage() {
+  const [data, setData] = useState<{ trials: Trial[]; scans: Scan[] } | null>(null);
+
+  useEffect(() => {
+    Promise.all([listTrials(), listScans()])
+      .then(([trials, scans]) => setData({ trials, scans }))
+      .catch(() => setData({ trials: [], scans: [] }));
+  }, []);
+
+  if (!data) return <ShelfSkeleton />;
+  const trials = activeTrials(data.trials);
+  if (trials.length === 0) return <EmptyShelf />;
+
+  const today = new Date();
+  const hasRealTrial = trials.some(t => !t.isSample);
+
+  return (
+    <section>
+      <PageHeader eyebrow="Your shelf" title="What you're testing" />
+      <ul className="space-y-4">
+        {trials.map((trial, i) => {
+          const scans = scansForTrial(trial, data.scans);
+          return (
+            <li key={trial.id} className="animate-rise" style={{ animationDelay: `${i * 40}ms` }}>
+              <TrialCard
+                trial={trial}
+                verdict={computeVerdict(trial, scans, data.trials, today)}
+                nextCheckIn={nextCheckIn(scans, today)}
+              />
+            </li>
+          );
+        })}
+      </ul>
+      <div className="mt-8 space-y-3">
+        {hasRealTrial && (
+          <ButtonLink href="/scan" className="w-full">
+            <Camera aria-hidden size={20} weight="bold" />
+            Check in now
+          </ButtonLink>
+        )}
+        <ButtonLink href="/trial/new" variant={hasRealTrial ? 'secondary' : 'primary'} className="w-full">
+          Start {hasRealTrial ? 'another' : 'a'} trial
+        </ButtonLink>
+      </div>
+      <Disclaimer />
+    </section>
   );
 }
