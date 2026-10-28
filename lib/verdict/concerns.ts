@@ -23,26 +23,28 @@ export interface ConcernInfo {
   windowDays: number | null;
   targetable: boolean;
   simulable: boolean;
+  /** Parameter name in the Skin Simulation request body, or null if not simulable. */
+  simKey: string | null;
 }
 
 // Spec §5.1, in order.
 export const CONCERNS: readonly ConcernInfo[] = [
-  { id: 'moisture', label: 'Hydration', windowDays: 14, targetable: true, simulable: false },
-  { id: 'oiliness', label: 'Oiliness', windowDays: 28, targetable: true, simulable: true },
-  { id: 'radiance', label: 'Radiance', windowDays: 28, targetable: true, simulable: true },
-  { id: 'redness', label: 'Redness', windowDays: 28, targetable: true, simulable: true },
-  { id: 'acne', label: 'Breakouts', windowDays: 42, targetable: true, simulable: true },
-  { id: 'pore', label: 'Pores', windowDays: 56, targetable: true, simulable: true },
-  { id: 'texture', label: 'Texture', windowDays: 56, targetable: true, simulable: true },
-  { id: 'dark_circle_v2', label: 'Dark circles', windowDays: 56, targetable: true, simulable: true },
-  { id: 'eye_bag', label: 'Eye bags', windowDays: 56, targetable: true, simulable: true },
-  { id: 'age_spot', label: 'Dark spots', windowDays: 84, targetable: true, simulable: true },
-  { id: 'wrinkle', label: 'Fine lines', windowDays: 84, targetable: true, simulable: true },
-  { id: 'firmness', label: 'Firmness', windowDays: 84, targetable: true, simulable: false },
-  { id: 'tear_trough', label: 'Tear trough', windowDays: 84, targetable: true, simulable: false },
-  { id: 'droopy_upper_eyelid', label: 'Upper eyelid', windowDays: null, targetable: false, simulable: false },
-  { id: 'droopy_lower_eyelid', label: 'Lower eyelid', windowDays: null, targetable: false, simulable: false },
-  { id: 'skin_type', label: 'Skin type', windowDays: null, targetable: false, simulable: false },
+  { id: 'moisture', label: 'Hydration', windowDays: 14, targetable: true, simulable: false, simKey: null },
+  { id: 'oiliness', label: 'Oiliness', windowDays: 28, targetable: true, simulable: true, simKey: 'oiliness' },
+  { id: 'radiance', label: 'Radiance', windowDays: 28, targetable: true, simulable: true, simKey: 'radiance' },
+  { id: 'redness', label: 'Redness', windowDays: 28, targetable: true, simulable: true, simKey: 'redness' },
+  { id: 'acne', label: 'Breakouts', windowDays: 42, targetable: true, simulable: true, simKey: 'acne' },
+  { id: 'pore', label: 'Pores', windowDays: 56, targetable: true, simulable: true, simKey: 'pores' },
+  { id: 'texture', label: 'Texture', windowDays: 56, targetable: true, simulable: true, simKey: 'texture' },
+  { id: 'dark_circle_v2', label: 'Dark circles', windowDays: 56, targetable: true, simulable: true, simKey: 'dark_circle' },
+  { id: 'eye_bag', label: 'Eye bags', windowDays: 56, targetable: true, simulable: true, simKey: 'eye_bags' },
+  { id: 'age_spot', label: 'Dark spots', windowDays: 84, targetable: true, simulable: true, simKey: 'spots' },
+  { id: 'wrinkle', label: 'Fine lines', windowDays: 84, targetable: true, simulable: true, simKey: 'wrinkle' },
+  { id: 'firmness', label: 'Firmness', windowDays: 84, targetable: true, simulable: false, simKey: null },
+  { id: 'tear_trough', label: 'Tear trough', windowDays: 84, targetable: true, simulable: false, simKey: null },
+  { id: 'droopy_upper_eyelid', label: 'Upper eyelid', windowDays: null, targetable: false, simulable: false, simKey: null },
+  { id: 'droopy_lower_eyelid', label: 'Lower eyelid', windowDays: null, targetable: false, simulable: false, simKey: null },
+  { id: 'skin_type', label: 'Skin type', windowDays: null, targetable: false, simulable: false, simKey: null },
 ];
 
 export const SD_ACTIONS: readonly ConcernId[] = CONCERNS.map(c => c.id);

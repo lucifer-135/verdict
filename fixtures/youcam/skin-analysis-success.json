@@ -1,0 +1,190 @@
+{
+  "status": 200,
+  "data": {
+    "error": null,
+    "results": {
+      "output": [
+        {
+          "ui_score": 77,
+          "mask_urls": [
+            "/fixtures/masks/tear_trough.jpg"
+          ],
+          "raw_score": 70.83284258842468,
+          "type": "tear_trough",
+          "url": null
+        },
+        {
+          "ui_score": 98,
+          "mask_urls": [
+            "/fixtures/masks/redness.jpg"
+          ],
+          "raw_score": 99.03449249267578,
+          "type": "redness",
+          "url": null
+        },
+        {
+          "ui_score": 77,
+          "mask_urls": [
+            "/fixtures/masks/droopy_lower_eyelid.jpg"
+          ],
+          "raw_score": 72.37889766693115,
+          "type": "droopy_lower_eyelid",
+          "url": null
+        },
+        {
+          "ui_score": 81,
+          "mask_urls": [
+            "/fixtures/masks/droopy_upper_eyelid.jpg"
+          ],
+          "raw_score": 80.96933364868164,
+          "type": "droopy_upper_eyelid",
+          "url": null
+        },
+        {
+          "ui_score": 76,
+          "mask_urls": [
+            "/fixtures/masks/eye_bag.jpg"
+          ],
+          "raw_score": 69.61462497711182,
+          "type": "eye_bag",
+          "url": null
+        },
+        {
+          "ui_score": 79,
+          "mask_urls": [
+            "/fixtures/masks/firmness.jpg"
+          ],
+          "raw_score": 76.19941830635071,
+          "type": "firmness",
+          "url": null
+        },
+        {
+          "ui_score": 71,
+          "mask_urls": [
+            "/fixtures/masks/pore.jpg"
+          ],
+          "raw_score": 58.519630670547485,
+          "type": "pore",
+          "url": null
+        },
+        {
+          "ui_score": 84,
+          "mask_urls": [
+            "/fixtures/masks/texture.jpg"
+          ],
+          "raw_score": 87.68185377120972,
+          "type": "texture",
+          "url": null
+        },
+        {
+          "ui_score": 77,
+          "mask_urls": [
+            "/fixtures/masks/oiliness.jpg"
+          ],
+          "raw_score": 72.12769317626953,
+          "type": "oiliness",
+          "url": null
+        },
+        {
+          "ui_score": 85,
+          "mask_urls": [
+            "/fixtures/masks/age_spot.jpg"
+          ],
+          "raw_score": 92.68782043457031,
+          "type": "age_spot",
+          "url": null
+        },
+        {
+          "ui_score": 84,
+          "mask_urls": [
+            "/fixtures/masks/radiance.jpg"
+          ],
+          "raw_score": 86.79784536361694,
+          "type": "radiance",
+          "url": null
+        },
+        {
+          "ui_score": 87,
+          "mask_urls": [
+            "/fixtures/masks/wrinkle.jpg"
+          ],
+          "raw_score": 93.57417225837708,
+          "type": "wrinkle",
+          "url": null
+        },
+        {
+          "ui_score": 90,
+          "mask_urls": [
+            "/fixtures/masks/acne.jpg"
+          ],
+          "raw_score": 93.59173,
+          "type": "acne",
+          "url": null
+        },
+        {
+          "ui_score": 73,
+          "mask_urls": [
+            "/fixtures/masks/dark_circle_v2.jpg"
+          ],
+          "raw_score": 72.27890491485596,
+          "type": "dark_circle_v2",
+          "url": null
+        },
+        {
+          "ui_score": 73,
+          "mask_urls": [
+            "/fixtures/masks/moisture.jpg"
+          ],
+          "raw_score": 57.60204195976257,
+          "type": "moisture",
+          "url": null
+        },
+        {
+          "mask_urls": [
+            "/fixtures/masks/skin_type.jpg"
+          ],
+          "type": "skin_type",
+          "region": "whole",
+          "skin_type": "Combination",
+          "url": null
+        },
+        {
+          "mask_urls": [
+            "/fixtures/masks/skin_type.jpg"
+          ],
+          "type": "skin_type",
+          "region": "t_zone",
+          "skin_type": "Oily",
+          "url": null
+        },
+        {
+          "mask_urls": [
+            "/fixtures/masks/skin_type.jpg"
+          ],
+          "type": "skin_type",
+          "region": "u_zone",
+          "skin_type": "Normal",
+          "url": null
+        },
+        {
+          "score": 80.8,
+          "type": "all",
+          "url": null,
+          "mask_urls": []
+        },
+        {
+          "score": 21,
+          "type": "skin_age",
+          "url": null,
+          "mask_urls": []
+        },
+        {
+          "mask_urls": [],
+          "type": "resize_image",
+          "url": null
+        }
+      ]
+    },
+    "task_status": "success"
+  }
+}

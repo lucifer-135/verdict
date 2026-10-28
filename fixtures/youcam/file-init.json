@@ -1,0 +1,22 @@
+{
+  "status": 200,
+  "data": {
+    "files": [
+      {
+        "content_type": "image/jpeg",
+        "file_name": "spike-selfie.jpg",
+        "file_id": "d/IEUjD4Z6xlvZhZgqL5TyV7eTlJv6X7X6MtSzpMvAALbKfeLEmuXUa9yH4wuc2K",
+        "requests": [
+          {
+            "method": "PUT",
+            "url": "https://example.invalid/presigned-upload",
+            "headers": {
+              "Content-Length": "58382",
+              "Content-Type": "image/jpeg"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

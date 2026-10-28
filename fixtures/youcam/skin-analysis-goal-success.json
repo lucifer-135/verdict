@@ -1,0 +1,42 @@
+{
+  "status": 200,
+  "data": {
+    "error": null,
+    "results": {
+      "output": [
+        {
+          "ui_score": 94,
+          "mask_urls": [],
+          "raw_score": 96.46373748779297,
+          "type": "oiliness",
+          "url": null
+        },
+        {
+          "ui_score": 80,
+          "mask_urls": [],
+          "raw_score": 79.09942150115967,
+          "type": "pore",
+          "url": null
+        },
+        {
+          "score": 87,
+          "type": "all",
+          "url": null,
+          "mask_urls": []
+        },
+        {
+          "score": 21,
+          "type": "skin_age",
+          "url": null,
+          "mask_urls": []
+        },
+        {
+          "mask_urls": [],
+          "type": "resize_image",
+          "url": null
+        }
+      ]
+    },
+    "task_status": "success"
+  }
+}

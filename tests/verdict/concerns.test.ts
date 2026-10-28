@@ -31,3 +31,14 @@ test('labels', () => {
   expect(getConcern('age_spot').label).toBe('Dark spots');
   expect(getConcern('wrinkle').label).toBe('Fine lines');
 });
+
+test('simulation keys map to the Skin Simulation API names', () => {
+  expect(getConcern('oiliness').simKey).toBe('oiliness');
+  expect(getConcern('eye_bag').simKey).toBe('eye_bags');
+  expect(getConcern('dark_circle_v2').simKey).toBe('dark_circle');
+  expect(getConcern('age_spot').simKey).toBe('spots');
+  expect(getConcern('pore').simKey).toBe('pores');
+  expect(getConcern('moisture').simKey).toBeNull();
+  expect(CONCERNS.filter(c => c.simKey !== null).every(c => c.simulable)).toBe(true);
+  expect(CONCERNS.filter(c => c.simulable).every(c => c.simKey !== null)).toBe(true);
+});

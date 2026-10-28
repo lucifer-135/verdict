@@ -1,0 +1,9 @@
+{
+  "status": 200,
+  "data": {
+    "error": "error_below_min_image_size",
+    "error_message": "The input image is below the minimum required resolution.",
+    "results": null,
+    "task_status": "error"
+  }
+}

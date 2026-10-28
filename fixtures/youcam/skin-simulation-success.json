@@ -1,0 +1,10 @@
+{
+  "status": 200,
+  "data": {
+    "error": null,
+    "results": {
+      "url": "/fixtures/sim-result.jpg"
+    },
+    "task_status": "success"
+  }
+}
