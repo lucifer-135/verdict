@@ -1,0 +1,33 @@
+import { CONCERNS, SD_ACTIONS, TARGETABLE, getConcern } from '@/lib/verdict/concerns';
+
+test('catalog has 16 SD concerns', () => {
+  expect(SD_ACTIONS).toHaveLength(16);
+  expect(new Set(CONCERNS.map(c => c.id))).toEqual(new Set(SD_ACTIONS));
+});
+
+test('13 targetable concerns; eyelids and skin_type are not', () => {
+  expect(TARGETABLE).toHaveLength(13);
+  for (const id of ['droopy_upper_eyelid', 'droopy_lower_eyelid', 'skin_type'] as const)
+    expect(getConcern(id).targetable).toBe(false);
+});
+
+test('windows match spec', () => {
+  expect(getConcern('moisture').windowDays).toBe(14);
+  expect(getConcern('oiliness').windowDays).toBe(28);
+  expect(getConcern('acne').windowDays).toBe(42);
+  expect(getConcern('pore').windowDays).toBe(56);
+  expect(getConcern('wrinkle').windowDays).toBe(84);
+  expect(getConcern('skin_type').windowDays).toBeNull();
+});
+
+test('moisture, firmness, tear_trough are not simulable', () => {
+  expect(CONCERNS.filter(c => c.targetable && !c.simulable).map(c => c.id).sort())
+    .toEqual(['firmness', 'moisture', 'tear_trough']);
+});
+
+test('labels', () => {
+  expect(getConcern('acne').label).toBe('Breakouts');
+  expect(getConcern('dark_circle_v2').label).toBe('Dark circles');
+  expect(getConcern('age_spot').label).toBe('Dark spots');
+  expect(getConcern('wrinkle').label).toBe('Fine lines');
+});
