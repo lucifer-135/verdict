@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { CalendarCheck, Camera, Scales } from '@phosphor-icons/react';
 import { Disclaimer } from '@/components/Disclaimer';
 import { TrialCard } from '@/components/TrialCard';
 import { Button, ButtonLink, PageHeader } from '@/components/ui';
 import { VerdictChip } from '@/components/VerdictChip';
+import { hasSampleJourney, loadSampleJourney } from '@/lib/sample/load';
 import { listScans, listTrials } from '@/lib/store/db';
 import { activeTrials, nextCheckIn, scansForTrial } from '@/lib/trials/view';
 import { computeVerdict } from '@/lib/verdict/engine';
@@ -64,12 +66,29 @@ function EmptyShelf() {
         <ButtonLink href="/trial/new" className="w-full">
           Start a trial
         </ButtonLink>
-        <Button variant="secondary" className="w-full" disabled>
-          View sample journey
-        </Button>
+        <SampleButton variant="secondary" />
       </div>
       <Disclaimer />
     </section>
+  );
+}
+
+function SampleButton({ variant }: { variant: 'secondary' | 'ghost' }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  if (!hasSampleJourney()) return null;
+  return (
+    <Button
+      variant={variant}
+      className="w-full"
+      disabled={loading}
+      onClick={async () => {
+        setLoading(true);
+        router.push(`/trial/${await loadSampleJourney()}`);
+      }}
+    >
+      {loading ? 'Loading sample…' : 'View sample journey'}
+    </Button>
   );
 }
 
@@ -127,6 +146,7 @@ export default function ShelfPage() {
         <ButtonLink href="/trial/new" variant={hasRealTrial ? 'secondary' : 'primary'} className="w-full">
           Start {hasRealTrial ? 'another' : 'a'} trial
         </ButtonLink>
+        {!trials.some(t => t.isSample) && <SampleButton variant="ghost" />}
       </div>
       <Disclaimer />
     </section>

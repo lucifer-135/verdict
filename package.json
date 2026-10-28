@@ -9,7 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "spike": "tsx --env-file=.env.local scripts/spike.ts",
-    "record-sample": "tsx --env-file=.env.local scripts/record-sample.ts",
+    "record-sample": "tsx --conditions=react-server --env-file=.env.local scripts/record-sample.ts",
     "dev:mock": "node scripts/dev-mock.mjs"
   },
   "dependencies": {
@@ -38,6 +38,7 @@
     "eslint-config-next": "15.5.28",
     "fake-indexeddb": "^6.2.6",
     "jsdom": "^29.1.1",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5",
