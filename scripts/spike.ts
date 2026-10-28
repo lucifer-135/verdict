@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- one-off script over untyped API JSON */
 /**
  * One-off live check of the YouCam API shapes (plan Task 3).
  * Reads .local/spike-selfie.jpg and .local/spike-selfie-2.jpg, records responses
@@ -52,7 +53,10 @@ async function poll(kind: string, taskId: string, onFirstRunning?: (r: unknown) 
   for (;;) {
     const r = await api('GET', `/s2s/v2.0/task/${kind}/${encodeURIComponent(taskId)}`);
     const status = r?.data?.task_status;
-    if (status === 'running') onFirstRunning?.(r), (onFirstRunning = undefined);
+    if (status === 'running' && onFirstRunning) {
+      onFirstRunning(r);
+      onFirstRunning = undefined;
+    }
     if (status === 'success' || status === 'error' || !status) {
       log(`${kind} finished: ${status} in ${((Date.now() - t0) / 1000).toFixed(1)}s`);
       return r;
