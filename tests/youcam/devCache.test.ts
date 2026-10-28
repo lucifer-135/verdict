@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { mkdtempSync } from 'node:fs';
+import { existsSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { vi } from 'vitest';
@@ -42,4 +42,20 @@ test('different actions miss the cache', async () => {
   await client.getSkinAnalysis((await client.createSkinAnalysis({ bytes }, ['oiliness'])).taskId);
   await client.createSkinAnalysis({ bytes }, ['pore']);
   expect(inner.createSkinAnalysis).toHaveBeenCalledTimes(2);
+});
+
+test('cached ids that are not a sha256 key are rejected without touching disk', async () => {
+  const inner = fakeClient();
+  const client = withDevCache(inner, mkdtempSync(join(tmpdir(), 'yc-')));
+  await expect(client.getSkinAnalysis('cached:../../package')).rejects.toMatchObject({ code: 'InvalidTaskId' });
+  expect(inner.getSkinAnalysis).not.toHaveBeenCalled();
+});
+
+test('a forged key suffix is ignored and nothing is written outside the cache dir', async () => {
+  const inner = fakeClient();
+  const dir = join(mkdtempSync(join(tmpdir(), 'yc-')), 'cache');
+  const client = withDevCache(inner, dir);
+  await client.getSkinAnalysis('real-1~../escaped');
+  expect(inner.getSkinAnalysis).toHaveBeenCalledWith('real-1');
+  expect(existsSync(join(dir, '../escaped.json'))).toBe(false);
 });

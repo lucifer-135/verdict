@@ -14,6 +14,7 @@ import { VerdictCard } from '@/components/VerdictCard';
 import { useBlobUrl } from '@/lib/store/useBlobUrl';
 import { chartData } from '@/lib/trials/chartData';
 import { useTrialData } from '@/lib/trials/useTrialData';
+import { baselineScan, evaluationDate } from '@/lib/trials/view';
 import { getConcern, type ConcernId } from '@/lib/verdict/concerns';
 import { computeVerdict } from '@/lib/verdict/engine';
 
@@ -39,7 +40,7 @@ export default function TrialPage() {
   const trial = data?.trial;
   const scans = data?.scans ?? [];
   const concern = picked ?? trial?.concerns[0] ?? null;
-  const first = scans[0];
+  const first = (trial && baselineScan(trial, scans)) ?? scans[0];
   const latest = scans[scans.length - 1];
 
   const firstPhoto = useBlobUrl(first?.photoBlobId);
@@ -53,7 +54,7 @@ export default function TrialPage() {
     return <PageHeader back={{ href: '/', label: 'Shelf' }} title="Trial not found" subtitle="It may have been cleared from this browser." />;
   }
 
-  const verdict = computeVerdict(trial, scans, data.allTrials, new Date());
+  const verdict = computeVerdict(trial, scans, data.allTrials, evaluationDate(trial, scans, new Date()));
   const series = chartData(trial, scans, verdict, concern);
   const canSimulate = trial.concerns.some(c => getConcern(c).simulable);
   const pairs: { key: Pair; label: string }[] = [

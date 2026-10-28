@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { Camera, UploadSimple } from '@phosphor-icons/react';
 import { BRIGHTNESS_MIN, meanLuminance } from '@/lib/image/prep';
+import { createGate } from '@/lib/scan/gate';
 import { buttonClass } from './ui';
 
 type Mode = 'starting' | 'live' | 'fallback';
@@ -31,6 +32,8 @@ export function CameraCapture({ onCapture }: { onCapture: (file: Blob) => void }
   const videoRef = useRef<HTMLVideoElement>(null);
   const [mode, setMode] = useState<Mode>('starting');
   const [tooDark, setTooDark] = useState(false);
+  const [capturing, setCapturing] = useState(false);
+  const gate = useRef(createGate());
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -77,12 +80,27 @@ export function CameraCapture({ onCapture }: { onCapture: (file: Blob) => void }
   function capture() {
     const v = videoRef.current;
     if (!v) return;
-    const crop = centerCrop(v.videoWidth, v.videoHeight);
-    const canvas = document.createElement('canvas');
-    canvas.width = crop.w;
-    canvas.height = crop.h;
-    canvas.getContext('2d')!.drawImage(v, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
-    canvas.toBlob(b => b && onCapture(b), 'image/jpeg', 0.92);
+    setCapturing(true);
+    gate.current
+      .run(
+        () =>
+          new Promise<void>(resolve => {
+            const crop = centerCrop(v.videoWidth, v.videoHeight);
+            const canvas = document.createElement('canvas');
+            canvas.width = crop.w;
+            canvas.height = crop.h;
+            canvas.getContext('2d')!.drawImage(v, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
+            canvas.toBlob(
+              b => {
+                if (b) onCapture(b);
+                resolve();
+              },
+              'image/jpeg',
+              0.92,
+            );
+          }),
+      )
+      .finally(() => setCapturing(false));
   }
 
   if (mode === 'fallback') {
@@ -137,7 +155,7 @@ export function CameraCapture({ onCapture }: { onCapture: (file: Blob) => void }
           <button
             type="button"
             onClick={capture}
-            disabled={mode !== 'live' || tooDark}
+            disabled={mode !== 'live' || tooDark || capturing}
             aria-label="Take photo"
             className="grid size-[72px] cursor-pointer place-items-center rounded-full bg-white/95 ring-4 ring-white/40 transition-transform duration-150 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >

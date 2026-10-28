@@ -83,3 +83,16 @@ test('runQueue marks a failed item and continues', async () => {
   expect(result[0]).toMatchObject({ status: 'failed', error: 'Move closer so your face fills the oval.' });
   expect(result[1].status).toBe('done');
 });
+
+test('withDate rejects years before 2000 and future dates', () => {
+  const item: ImportItem = { ...photo(1), hash: 'h', takenAt: null, status: 'needs_date' };
+  const today = new Date(2026, 9, 29);
+  for (const bad of ['0002-10-01', '1999-12-31', '2026-10-30']) {
+    expect(withDate(item, bad, today)).toMatchObject({
+      status: 'needs_date',
+      takenAt: null,
+      error: 'Choose a date between 2000 and today.',
+    });
+  }
+  expect(withDate(item, '2026-10-29', today).status).toBe('ready');
+});

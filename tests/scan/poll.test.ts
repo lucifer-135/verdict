@@ -72,3 +72,12 @@ test('fetchWithRetry does not retry 400', async () => {
   expect((await fetchWithRetry('/api/x')).status).toBe(400);
   expect(fetchMock).toHaveBeenCalledTimes(1);
 });
+
+test('pollTask network failure keeps the taskId so the user can keep waiting', async () => {
+  vi.useFakeTimers();
+  vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('offline')));
+  const p = pollTask('/api/scan/t7');
+  const assertion = expect(p).rejects.toMatchObject({ code: 'network_error', taskId: 't7' });
+  await vi.advanceTimersByTimeAsync(3000);
+  await assertion;
+});

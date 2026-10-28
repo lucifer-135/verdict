@@ -1,10 +1,11 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowsClockwise, Check, CircleNotch, WarningCircle } from '@phosphor-icons/react';
 import { CameraCapture } from '@/components/CameraCapture';
 import { Button, Card, PageHeader } from '@/components/ui';
+import { createGate } from '@/lib/scan/gate';
 import { ScanError } from '@/lib/scan/poll';
 import { resumeScan, runScan, type ScanStatus } from '@/lib/scan/runScan';
 import { getTrial } from '@/lib/store/db';
@@ -57,12 +58,17 @@ function ScanFlow() {
   const then = params.get('then');
   const [trial, setTrial] = useState<Trial | null>(null);
   const [phase, setPhase] = useState<Phase>({ kind: 'capture' });
+  const gate = useRef(createGate());
 
   useEffect(() => {
     if (trialId) getTrial(trialId).then(t => setTrial(t ?? null));
   }, [trialId]);
 
-  async function run(file: Blob, resumeTaskId?: string) {
+  function run(file: Blob, resumeTaskId?: string) {
+    return gate.current.run(() => scan(file, resumeTaskId));
+  }
+
+  async function scan(file: Blob, resumeTaskId?: string) {
     const opts = { source: 'camera' as const, onStatus: (status: ScanStatus) => setPhase({ kind: 'working', status }) };
     try {
       setPhase({ kind: 'working', status: resumeTaskId ? 'analyzing' : 'preparing' });
@@ -76,6 +82,8 @@ function ScanFlow() {
   }
 
   const baseline = then === 'goal';
+  // These failures happen after the task was created, so the result may still arrive.
+  const resumable = phase.kind === 'error' && !!phase.error.taskId && ['poll_timeout', 'network_error'].includes(phase.error.code);
   return (
     <section>
       <PageHeader
@@ -107,21 +115,23 @@ function ScanFlow() {
             <div>
               <p className="font-semibold">{phase.error.friendly}</p>
               <p className="mt-1 text-sm text-ink-muted">
-                {phase.error.code === 'poll_timeout'
-                  ? 'Your scan is still processing. You can keep waiting.'
-                  : 'Nothing was saved. Try again with the tips above.'}
+                {resumable
+                  ? 'Your scan may still be processing. You can keep waiting for it.'
+                  : phase.error.code === 'save_failed'
+                    ? 'The analysis may have used units. Check that this browser allows site storage, then retake.'
+                    : 'Nothing was saved. Try again with the tips above.'}
               </p>
             </div>
           </div>
           <div className="mt-5 space-y-3">
-            {phase.error.code === 'poll_timeout' && phase.error.taskId && (
+            {resumable && (
               <Button className="w-full" onClick={() => run(phase.file, phase.error.taskId)}>
                 <ArrowsClockwise aria-hidden size={18} weight="bold" />
                 Keep waiting
               </Button>
             )}
             <Button
-              variant={phase.error.code === 'poll_timeout' ? 'secondary' : 'primary'}
+              variant={resumable ? 'secondary' : 'primary'}
               className="w-full"
               onClick={() => setPhase({ kind: 'capture' })}
             >

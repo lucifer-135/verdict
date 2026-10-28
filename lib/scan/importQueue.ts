@@ -1,3 +1,4 @@
+import { endOfDay } from 'date-fns';
 import { readTakenAt, sha256Hex } from '@/lib/image/prep';
 import { findScanByHash } from '@/lib/store/db';
 import { ScanError } from './poll';
@@ -28,10 +29,17 @@ export async function buildQueue(files: { file: Blob; name: string }[]): Promise
   return items;
 }
 
-/** Give an undated photo a date (local noon) and mark it ready. */
-export function withDate(item: ImportItem, yyyyMmDd: string): ImportItem {
+/**
+ * Give an undated photo a date (local noon) and mark it ready. Years before 2000
+ * and future dates are rejected, so a half-typed year like "0002" cannot slip in.
+ */
+export function withDate(item: ImportItem, yyyyMmDd: string, today = new Date()): ImportItem {
   const [y, m, d] = yyyyMmDd.split('-').map(Number);
-  return { ...item, takenAt: new Date(y, m - 1, d, 12).toISOString(), status: 'ready', error: undefined };
+  const date = new Date(y, m - 1, d, 12);
+  if (!(y >= 2000) || Number.isNaN(date.getTime()) || date > endOfDay(today)) {
+    return { ...item, takenAt: null, status: 'needs_date', error: 'Choose a date between 2000 and today.' };
+  }
+  return { ...item, takenAt: date.toISOString(), status: 'ready', error: undefined };
 }
 
 /** Scan ready items one at a time (each costs units); failures don't stop the rest. */

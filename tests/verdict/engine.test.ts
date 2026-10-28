@@ -186,3 +186,9 @@ test('future start date → too_early', () => {
     'Too early to judge. First fair read on Sep 24.',
   );
 });
+
+test('scans more than 14 days before the start are not part of the baseline', () => {
+  const r = v([mk(-60, { oiliness: 40 }), mk(0, { oiliness: 60 }), mk(14, { oiliness: 64 }), mk(21, { oiliness: 66 })], 21);
+  expect(r.perConcern[0]).toMatchObject({ baseline: 60, noise: 3 });
+  expect(r.kind).toBe('working');
+});

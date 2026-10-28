@@ -9,7 +9,7 @@ import { Button, ButtonLink, PageHeader } from '@/components/ui';
 import { VerdictChip } from '@/components/VerdictChip';
 import { hasSampleJourney, loadSampleJourney } from '@/lib/sample/load';
 import { listScans, listTrials } from '@/lib/store/db';
-import { activeTrials, nextCheckIn, scansForTrial } from '@/lib/trials/view';
+import { activeTrials, evaluationDate, nextCheckIn, scansForTrial } from '@/lib/trials/view';
 import { computeVerdict } from '@/lib/verdict/engine';
 import type { Scan, Trial } from '@/lib/verdict/types';
 
@@ -129,7 +129,7 @@ export default function ShelfPage() {
             <li key={trial.id} className="animate-rise" style={{ animationDelay: `${i * 40}ms` }}>
               <TrialCard
                 trial={trial}
-                verdict={computeVerdict(trial, scans, data.trials, today)}
+                verdict={computeVerdict(trial, scans, data.trials, evaluationDate(trial, scans, today))}
                 nextCheckIn={nextCheckIn(scans, today)}
               />
             </li>

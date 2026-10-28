@@ -8,3 +8,11 @@ test('friendlyMessage copy', () => {
   expect(friendlyMessage('poll_timeout')).toBe('Taking longer than usual.');
   expect(friendlyMessage('whatever')).toBe('Scan failed. No units were charged.');
 });
+
+test('friendlyMessage for failures after the task exists', () => {
+  expect(friendlyMessage('network_error')).toBe('The connection dropped while waiting for your result.');
+  expect(friendlyMessage('save_failed')).toBe('Your scan finished but could not be saved on this device.');
+  expect(friendlyMessage('storage_unavailable')).toBe(
+    'This browser cannot save scans. Turn off private browsing and try again.',
+  );
+});

@@ -1,5 +1,5 @@
 import { PrepError, prepareImage } from '@/lib/image/prep';
-import { putBlob, saveScan } from '@/lib/store/db';
+import { isStorageAvailable, putBlob, saveScan } from '@/lib/store/db';
 import type { ConcernId } from '@/lib/verdict/concerns';
 import type { Scan } from '@/lib/verdict/types';
 import type { SkinAnalysisResult } from '@/lib/youcam/normalize';
@@ -30,7 +30,8 @@ export async function startAnalysis(image: Blob, actions?: readonly ConcernId[])
   form.append('image', image, 'scan.jpg');
   if (actions) form.append('actions', actions.join(','));
   const { taskId } = await readJson<{ taskId: string }>(
-    await fetchWithRetry('/api/scan', { method: 'POST', body: form }),
+    // Never retry: a retried POST can create a second paid task.
+    await fetchWithRetry('/api/scan', { method: 'POST', body: form }, 0),
   );
   return taskId;
 }
@@ -53,6 +54,14 @@ async function finish(taskId: string, prepared: Blob, opts: ScanOptions): Promis
   const result = await pollTask<SkinAnalysisResult>(analysisUrl(taskId));
 
   opts.onStatus?.('saving');
+  try {
+    return await save(result, prepared, opts);
+  } catch {
+    throw new ScanError('save_failed', taskId);
+  }
+}
+
+async function save(result: SkinAnalysisResult, prepared: Blob, opts: ScanOptions): Promise<Scan> {
   const maskBlobIds: Scan['maskBlobIds'] = {};
   await Promise.all(
     Object.entries(result.maskUrls).map(async ([concern, url]) => {
@@ -78,6 +87,8 @@ async function finish(taskId: string, prepared: Blob, opts: ScanOptions): Promis
 
 /** Prepare, upload, analyze and save one photo. Throws ScanError with friendly copy. */
 export async function runScan(file: Blob, opts: ScanOptions): Promise<Scan> {
+  // Check before spending units: a scan that cannot be saved is wasted.
+  if (!(await isStorageAvailable())) throw new ScanError('storage_unavailable');
   opts.onStatus?.('preparing');
   const prepared = await prepare(file);
   opts.onStatus?.('uploading');

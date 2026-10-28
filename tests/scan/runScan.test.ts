@@ -150,3 +150,41 @@ test('runGoal chains simulate → analyze with intensity 0.4', async () => {
   expect(goal?.scores).toEqual({ oiliness: 96.5 });
   expect((await getBlob(goal!.imageBlobId))?.size).toBe(3);
 });
+
+describe('final-review fixes', () => {
+  const broken = {
+    open: () => {
+      throw new Error('storage blocked');
+    },
+  } as unknown as IDBFactory;
+
+  test('a failed create POST is not retried (no second paid task)', async () => {
+    serve(url => (url === '/api/scan' ? new Response('', { status: 503 }) : undefined));
+    await expect(runScan(photo, { source: 'camera' })).rejects.toBeInstanceOf(Error);
+    expect(calls.filter(c => c.url === '/api/scan')).toHaveLength(1);
+  });
+
+  test('a failed simulate POST is not retried', async () => {
+    serve(url => (url === '/api/simulate' ? new Response('', { status: 503 }) : undefined));
+    await expect(runGoal(trial(['oiliness']), photo)).rejects.toBeInstanceOf(Error);
+    expect(calls.filter(c => c.url === '/api/simulate')).toHaveLength(1);
+  });
+
+  test('a storage failure after analysis keeps the taskId and says so', async () => {
+    serve(url => {
+      if (url === '/api/scan') return json({ taskId: 't1' });
+      if (url === '/api/scan/t1') {
+        globalThis.indexedDB = broken;
+        return json({ ...analysis, result: { ...analysis.result, maskUrls: {} } });
+      }
+    });
+    await expect(runScan(photo, { source: 'camera' })).rejects.toMatchObject({ code: 'save_failed', taskId: 't1' });
+  });
+
+  test('runScan refuses to upload when storage is unavailable', async () => {
+    globalThis.indexedDB = broken;
+    serve(() => json({ taskId: 't1' }));
+    await expect(runScan(photo, { source: 'camera' })).rejects.toMatchObject({ code: 'storage_unavailable' });
+    expect(calls).toHaveLength(0);
+  });
+});

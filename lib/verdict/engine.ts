@@ -4,7 +4,9 @@ import type { ConcernVerdict, Scan, SideEffect, Trial, VerdictKind, VerdictResul
 
 export const NOISE_DEFAULT = 3;
 /** Scans up to this many days after the start date count as baseline. */
-const BASELINE_LAST_DAY = 3;
+export const BASELINE_LAST_DAY = 3;
+/** Scans more than this many days before the start belong to earlier routines and are ignored. */
+export const BASELINE_LOOKBACK_DAYS = 14;
 /** No verdict other than Pause before this many days. */
 const MIN_DAYS = 14;
 const PAUSE_ADVICE = 'Possible irritation. Consider pausing; see a dermatologist if it persists.';
@@ -49,7 +51,8 @@ function analyze(concern: ConcernId, scans: Scan[], start: Date): Series {
   const points = scans
     .filter(s => s.scores[concern])
     .sort((a, b) => a.takenAt.localeCompare(b.takenAt))
-    .map(s => ({ day: differenceInCalendarDays(new Date(s.takenAt), start), raw: s.scores[concern]!.raw }));
+    .map(s => ({ day: differenceInCalendarDays(new Date(s.takenAt), start), raw: s.scores[concern]!.raw }))
+    .filter(p => p.day >= -BASELINE_LOOKBACK_DAYS);
 
   if (points.length === 0) {
     return { concern, hasData: false, baseline: null, noise: NOISE_DEFAULT, delta: null, slope: null, postCount: 0, lateDay: null };

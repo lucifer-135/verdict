@@ -95,13 +95,14 @@ function ImportFlow() {
                   <div className="min-w-0 flex-1">
                     {item.status === 'needs_date' ? (
                       <label className="block text-sm">
-                        <span className="mb-1 block font-medium">When was this taken?</span>
+                        <span className="mb-1 block font-medium">When was this taken? Choose the date, then tap outside the field.</span>
                         <input
                           type="date"
                           max={format(new Date(), 'yyyy-MM-dd')}
-                          onChange={e =>
-                            e.target.value && setItems(list => list.map((x, j) => (j === idx ? withDate(x, e.target.value) : x)))
-                          }
+                          onBlur={e => {
+                            const value = e.target.value;
+                            if (value) setItems(list => list.map((x, j) => (j === idx ? withDate(x, value) : x)));
+                          }}
                           className="min-h-11 w-full rounded-lg bg-surface px-3 text-base ring-1 ring-line ring-inset focus:ring-2 focus:ring-primary focus:outline-none"
                         />
                       </label>

@@ -1,4 +1,4 @@
-import { activeTrials, nextCheckIn, scansForTrial } from '@/lib/trials/view';
+import { activeTrials, baselineScan, evaluationDate, nextCheckIn, scansForTrial } from '@/lib/trials/view';
 import type { Scan, ScanSource, Trial } from '@/lib/verdict/types';
 
 const scan = (source: ScanSource, takenAt = '2026-09-01T09:00:00.000Z'): Scan => ({
@@ -53,4 +53,23 @@ test('activeTrials drops archived, newest first, sample last', () => {
     trial({ id: 'new', createdAt: '2026-09-20T00:00:00.000Z' }),
   ]);
   expect(list.map(t => t.id)).toEqual(['new', 'old', 'sample']);
+});
+
+describe('final-review fixes', () => {
+  const at = (day: number) => scan('camera', new Date(2026, 8, 1 + day, 9).toISOString());
+
+  test('baselineScan picks the latest scan in [start−14, start+3], else the first after', () => {
+    const t = trial();
+    expect(baselineScan(t, [at(-60), at(1), at(2), at(20)])?.takenAt).toBe(at(2).takenAt);
+    expect(baselineScan(t, [at(-60), at(20), at(27)])?.takenAt).toBe(at(20).takenAt);
+    expect(baselineScan(t, [at(-60)])).toBeNull();
+  });
+
+  test('evaluationDate pins the sample trial to its last scan', () => {
+    const now = new Date(2027, 0, 1);
+    const sampleScans = [scan('sample', '2026-09-01T09:00:00.000Z'), scan('sample', '2026-10-06T09:00:00.000Z')];
+    expect(evaluationDate(trial({ isSample: true }), sampleScans, now).toISOString()).toBe('2026-10-06T09:00:00.000Z');
+    expect(evaluationDate(trial(), [camera], now)).toBe(now);
+    expect(evaluationDate(trial({ isSample: true }), [], now)).toBe(now);
+  });
 });

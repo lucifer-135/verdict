@@ -1,4 +1,5 @@
-import { addDays, differenceInCalendarDays, format, startOfDay } from 'date-fns';
+import { addDays, differenceInCalendarDays, format, parseISO, startOfDay } from 'date-fns';
+import { BASELINE_LAST_DAY, BASELINE_LOOKBACK_DAYS } from '@/lib/verdict/engine';
 import type { Scan, Trial } from '@/lib/verdict/types';
 
 /** Days between check-ins (plan decision; spec leaves the cadence open). */
@@ -22,4 +23,25 @@ export function activeTrials(all: Trial[]): Trial[] {
   return all
     .filter(t => !t.archived)
     .sort((a, b) => Number(a.isSample) - Number(b.isSample) || b.createdAt.localeCompare(a.createdAt));
+}
+
+/**
+ * The scan that represents this trial's starting point: the latest one in
+ * [start − 14 days, start + 3 days], else the first one after that window.
+ * Scans belong to the person, so the oldest scan overall may predate the trial.
+ */
+export function baselineScan(trial: Trial, scans: Scan[]): Scan | null {
+  const start = parseISO(trial.startDate);
+  const dated = [...scans]
+    .sort((a, b) => a.takenAt.localeCompare(b.takenAt))
+    .map(s => ({ s, day: differenceInCalendarDays(new Date(s.takenAt), start) }))
+    .filter(x => x.day >= -BASELINE_LOOKBACK_DAYS);
+  const inWindow = dated.filter(x => x.day <= BASELINE_LAST_DAY);
+  return (inWindow.length ? inWindow[inWindow.length - 1] : dated[0])?.s ?? null;
+}
+
+/** The date a trial is judged at: the sample stays frozen at its last scan; real trials use now. */
+export function evaluationDate(trial: Trial, scans: Scan[], now: Date): Date {
+  if (!trial.isSample || scans.length === 0) return now;
+  return new Date(scans.reduce((a, b) => (a.takenAt > b.takenAt ? a : b)).takenAt);
 }

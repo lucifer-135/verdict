@@ -10,6 +10,7 @@ import { GOAL_INTENSITY, runGoal } from '@/lib/scan/runGoal';
 import { getBlob, saveTrial } from '@/lib/store/db';
 import { useBlobUrl } from '@/lib/store/useBlobUrl';
 import { useTrialData } from '@/lib/trials/useTrialData';
+import { baselineScan } from '@/lib/trials/view';
 import { getConcern } from '@/lib/verdict/concerns';
 import type { Trial, TrialGoal } from '@/lib/verdict/types';
 
@@ -33,7 +34,7 @@ export default function GoalPage() {
   const [error, setError] = useState<ScanError | null>(null);
   const [attempt, setAttempt] = useState(0);
 
-  const baseline = data?.scans[0] ?? null;
+  const baseline = data ? baselineScan(data.trial, data.scans) : null;
   const before = useBlobUrl(baseline?.photoBlobId);
   const goalImage = useBlobUrl(data?.trial.goal?.imageBlobId);
 

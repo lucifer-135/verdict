@@ -45,3 +45,12 @@ next-env.d.ts
 .local/
 .cache/
 .superpowers/
+
+
+CLAUDE.md
+
+# loose photos in the repo root (selfies stay local; sample photos live in public/sample)
+/*.jpg
+/*.jpeg
+/*.png
+/*.heic

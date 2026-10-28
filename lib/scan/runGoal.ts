@@ -21,7 +21,7 @@ export async function runGoal(trial: Trial, baselinePhoto: Blob): Promise<TrialG
   form.append('image', baselinePhoto, 'baseline.jpg');
   form.append('concerns', JSON.stringify(targets.map(concern => ({ concern, intensity: GOAL_INTENSITY }))));
   const { taskId } = await readJson<{ taskId: string }>(
-    await fetchWithRetry('/api/simulate', { method: 'POST', body: form }),
+    await fetchWithRetry('/api/simulate', { method: 'POST', body: form }, 0),
   );
   const { imageUrl } = await pollTask<SkinSimulationResult>(`/api/simulate/${encodeURIComponent(taskId)}`);
 

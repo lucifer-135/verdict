@@ -2,11 +2,14 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { YouCamClient } from './client';
+import { YouCamError } from './errors';
 import type { SkinAnalysisResult } from './normalize';
 
 const CACHED = 'cached:';
 /** Separates the real task id from the cache key; YouCam task ids never contain it. */
 const SEP = '~';
+/** Keys come from task ids in the URL; only a sha256 hex digest may become a file name. */
+const KEY = /^[a-f0-9]{64}$/;
 
 /**
  * Development-only wrapper: a finished skin analysis is stored on disk keyed by
@@ -32,12 +35,13 @@ export function withDevCache(inner: YouCamClient, dir: string): YouCamClient {
 
     async getSkinAnalysis(taskId) {
       if (taskId.startsWith(CACHED)) {
+        if (!KEY.test(taskId.slice(CACHED.length))) throw new YouCamError('InvalidTaskId', 400);
         const result = JSON.parse(readFileSync(fileFor(taskId.slice(CACHED.length)), 'utf8')) as SkinAnalysisResult;
         return { status: 'success', result };
       }
       const [realId, key] = taskId.split(SEP);
       const state = await inner.getSkinAnalysis(realId);
-      if (state.status === 'success' && key) {
+      if (state.status === 'success' && key && KEY.test(key)) {
         mkdirSync(dir, { recursive: true });
         writeFileSync(fileFor(key), JSON.stringify(state.result));
       }

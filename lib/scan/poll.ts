@@ -43,7 +43,14 @@ export async function pollTask<T>(url: string, { intervalMs = 2000, timeoutMs = 
   const taskId = decodeURIComponent(url.slice(url.lastIndexOf('/') + 1));
   const deadline = Date.now() + timeoutMs;
   for (;;) {
-    const state = await readJson<TaskState<T>>(await fetchWithRetry(url));
+    let res: Response;
+    try {
+      res = await fetchWithRetry(url);
+    } catch {
+      throw new ScanError('network_error', taskId);
+    }
+    if (res.status >= 500) throw new ScanError('network_error', taskId);
+    const state = await readJson<TaskState<T>>(res);
     if (state.status === 'success') return state.result;
     if (state.status === 'error') throw new ScanError(state.code, taskId);
     if (Date.now() + intervalMs > deadline) throw new ScanError('poll_timeout', taskId);
