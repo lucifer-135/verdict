@@ -16,3 +16,9 @@ test('friendlyMessage for failures after the task exists', () => {
     'This browser cannot save scans. Turn off private browsing and try again.',
   );
 });
+
+test('friendlyMessage for the daily cap', () => {
+  expect(friendlyMessage('rate_limited')).toBe(
+    'This demo has reached its daily scan limit for your device. Please try again tomorrow.',
+  );
+});

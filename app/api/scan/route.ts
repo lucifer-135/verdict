@@ -1,11 +1,13 @@
 import { SD_ACTIONS, isConcernId, type ConcernId } from '@/lib/verdict/concerns';
 import { getClient } from '@/lib/youcam/client';
-import { errorResponse, readImage, respond } from '@/lib/youcam/http';
+import { errorResponse, overScanLimit, readImage, respond } from '@/lib/youcam/http';
 
 export const runtime = 'nodejs';
 
 /** Start a skin analysis. Multipart: `image` (JPEG ≤ 4 MB), optional `actions` (comma list). */
 export async function POST(req: Request) {
+  const limited = overScanLimit(req);
+  if (limited) return limited;
   const read = await readImage(req);
   if (read instanceof Response) return read;
 

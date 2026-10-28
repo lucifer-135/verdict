@@ -106,3 +106,23 @@ describe('/api/asset', () => {
     expect((await assetGET(req(`/api/asset?u=${encodeURIComponent(u)}`))).status).toBe(502);
   });
 });
+
+describe('daily scan cap', () => {
+  test('POST /api/scan and /api/simulate return 429 once the per-IP cap is used', async () => {
+    vi.stubEnv('YOUCAM_MOCK', '0');
+    vi.stubEnv('SCAN_LIMIT_PER_IP_PER_DAY', '0');
+    const headers = { 'x-forwarded-for': '203.0.113.9, 10.0.0.1' };
+    const scan = await scanPOST(req('/api/scan', { method: 'POST', headers, body: form({ image: jpeg() }) }));
+    expect(scan.status).toBe(429);
+    expect(await scan.json()).toEqual({ error: { code: 'rate_limited' } });
+    const concerns = JSON.stringify([{ concern: 'oiliness', intensity: 0.4 }]);
+    const sim = await simPOST(req('/api/simulate', { method: 'POST', headers, body: form({ image: jpeg(), concerns }) }));
+    expect(sim.status).toBe(429);
+  });
+
+  test('mock mode is never capped', async () => {
+    vi.stubEnv('SCAN_LIMIT_PER_IP_PER_DAY', '0');
+    const res = await scanPOST(req('/api/scan', { method: 'POST', body: form({ image: jpeg() }) }));
+    expect(res.status).toBe(200);
+  });
+});

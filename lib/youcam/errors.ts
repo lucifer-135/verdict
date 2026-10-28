@@ -20,6 +20,7 @@ const MESSAGES: Record<string, string> = {
   network_error: 'The connection dropped while waiting for your result.',
   save_failed: 'Your scan finished but could not be saved on this device.',
   storage_unavailable: 'This browser cannot save scans. Turn off private browsing and try again.',
+  rate_limited: 'This demo has reached its daily scan limit for your device. Please try again tomorrow.',
 };
 
 export function friendlyMessage(code: string): string {

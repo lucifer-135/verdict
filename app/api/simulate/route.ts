@@ -1,6 +1,6 @@
 import { getConcern, isConcernId, type ConcernId } from '@/lib/verdict/concerns';
 import { getClient } from '@/lib/youcam/client';
-import { errorResponse, readImage, respond } from '@/lib/youcam/http';
+import { errorResponse, overScanLimit, readImage, respond } from '@/lib/youcam/http';
 
 export const runtime = 'nodejs';
 
@@ -29,6 +29,8 @@ function parseConcerns(raw: FormDataEntryValue | null): SimConcern[] | null {
 
 /** Start a skin simulation. Multipart: `image`, `concerns` (JSON [{ concern, intensity }]). */
 export async function POST(req: Request) {
+  const limited = overScanLimit(req);
+  if (limited) return limited;
   const read = await readImage(req);
   if (read instanceof Response) return read;
   const concerns = parseConcerns(read.form.get('concerns'));
