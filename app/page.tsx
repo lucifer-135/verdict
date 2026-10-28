@@ -76,19 +76,33 @@ function EmptyShelf() {
 function SampleButton({ variant }: { variant: 'secondary' | 'ghost' }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
   if (!hasSampleJourney()) return null;
   return (
-    <Button
-      variant={variant}
-      className="w-full"
-      disabled={loading}
-      onClick={async () => {
-        setLoading(true);
-        router.push(`/trial/${await loadSampleJourney()}`);
-      }}
-    >
-      {loading ? 'Loading sample…' : 'View sample journey'}
-    </Button>
+    <>
+      <Button
+        variant={variant}
+        className="w-full"
+        disabled={loading}
+        onClick={async () => {
+          setLoading(true);
+          setFailed(false);
+          try {
+            router.push(`/trial/${await loadSampleJourney()}`);
+          } catch {
+            setLoading(false);
+            setFailed(true);
+          }
+        }}
+      >
+        {loading ? 'Loading sample…' : 'View sample journey'}
+      </Button>
+      {failed && (
+        <p role="alert" className="text-center text-sm text-rose-700">
+          The sample could not be loaded. Please check your connection and try again.
+        </p>
+      )}
+    </>
   );
 }
 

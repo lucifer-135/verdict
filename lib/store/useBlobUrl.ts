@@ -10,7 +10,7 @@ export function useBlobUrl(id: string | null | undefined): string | null {
     if (!id) return setUrl(null);
     let objectUrl: string | null = null;
     let cancelled = false;
-    getBlob(id).then(b => {
+    getBlob(id).catch(() => undefined).then(b => {
       if (cancelled || !b) return;
       objectUrl = URL.createObjectURL(b);
       setUrl(objectUrl);

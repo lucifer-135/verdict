@@ -22,3 +22,7 @@ test('friendlyMessage for the daily cap', () => {
     'This demo has reached its daily scan limit for your device. Please try again tomorrow.',
   );
 });
+
+test('friendlyMessage for a photo that was already scanned', () => {
+  expect(friendlyMessage('duplicate_photo')).toBe('This photo has already been scanned.');
+});

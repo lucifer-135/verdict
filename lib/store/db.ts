@@ -13,7 +13,9 @@ interface VerdictSchema extends DBSchema {
   blobs: { key: string; value: StoredBlob };
 }
 
-function open(): Promise<IDBPDatabase<VerdictSchema>> {
+type Db = IDBPDatabase<VerdictSchema>;
+
+function open(): Promise<Db> {
   return openDB<VerdictSchema>('verdict', 1, {
     upgrade(db) {
       const scans = db.createObjectStore('scans', { keyPath: 'id' });
@@ -25,43 +27,69 @@ function open(): Promise<IDBPDatabase<VerdictSchema>> {
   });
 }
 
-export async function saveScan(s: Scan): Promise<void> {
-  await (await open()).put('scans', s);
+/** Open, run, close. An open connection would block a future schema upgrade in another tab. */
+async function withDb<T>(fn: (db: Db) => Promise<T>): Promise<T> {
+  const db = await open();
+  try {
+    return await fn(db);
+  } finally {
+    db.close();
+  }
 }
 
-export async function getScan(id: string): Promise<Scan | undefined> {
-  return (await open()).get('scans', id);
+export function saveScan(s: Scan): Promise<void> {
+  return withDb(async db => void (await db.put('scans', s)));
+}
+
+export function getScan(id: string): Promise<Scan | undefined> {
+  return withDb(db => db.get('scans', id));
 }
 
 /** All scans, oldest first. */
-export async function listScans(): Promise<Scan[]> {
-  return (await open()).getAllFromIndex('scans', 'takenAt');
+export function listScans(): Promise<Scan[]> {
+  return withDb(db => db.getAllFromIndex('scans', 'takenAt'));
 }
 
-export async function findScanByHash(hash: string): Promise<Scan | undefined> {
-  return (await open()).getFromIndex('scans', 'sourceHash', hash);
+export function findScanByHash(hash: string): Promise<Scan | undefined> {
+  return withDb(db => db.getFromIndex('scans', 'sourceHash', hash));
 }
 
-export async function saveTrial(t: Trial): Promise<void> {
-  await (await open()).put('trials', t);
+/** Remove a scan together with its photo and masks. */
+export function deleteScan(id: string): Promise<void> {
+  return withDb(async db => {
+    const tx = db.transaction(['scans', 'blobs'], 'readwrite');
+    const scan = await tx.objectStore('scans').get(id);
+    if (scan) {
+      for (const blobId of [scan.photoBlobId, ...Object.values(scan.maskBlobIds)]) {
+        if (blobId) await tx.objectStore('blobs').delete(blobId);
+      }
+      await tx.objectStore('scans').delete(id);
+    }
+    await tx.done;
+  });
 }
 
-export async function getTrial(id: string): Promise<Trial | undefined> {
-  return (await open()).get('trials', id);
+export function saveTrial(t: Trial): Promise<void> {
+  return withDb(async db => void (await db.put('trials', t)));
 }
 
-export async function listTrials(): Promise<Trial[]> {
-  return (await open()).getAll('trials');
+export function getTrial(id: string): Promise<Trial | undefined> {
+  return withDb(db => db.get('trials', id));
+}
+
+export function listTrials(): Promise<Trial[]> {
+  return withDb(db => db.getAll('trials'));
 }
 
 export async function putBlob(b: Blob): Promise<string> {
   const id = crypto.randomUUID();
-  await (await open()).put('blobs', { type: b.type, bytes: await b.arrayBuffer() }, id);
+  const bytes = await b.arrayBuffer();
+  await withDb(db => db.put('blobs', { type: b.type, bytes }, id));
   return id;
 }
 
 export async function getBlob(id: string): Promise<Blob | undefined> {
-  const stored = await (await open()).get('blobs', id);
+  const stored = await withDb(db => db.get('blobs', id));
   return stored ? new Blob([stored.bytes], { type: stored.type }) : undefined;
 }
 

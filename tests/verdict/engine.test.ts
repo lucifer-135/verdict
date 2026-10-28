@@ -192,3 +192,9 @@ test('scans more than 14 days before the start are not part of the baseline', ()
   expect(r.perConcern[0]).toMatchObject({ baseline: 60, noise: 3 });
   expect(r.kind).toBe('working');
 });
+
+test('too_early copy counts the check-ins still needed', () => {
+  expect(v([mk(0, { oiliness: 60 })], 20).reason).toBe(
+    'Too early to judge. Your first fair read comes after your next two check-ins.',
+  );
+});

@@ -126,3 +126,16 @@ describe('daily scan cap', () => {
     expect(res.status).toBe(200);
   });
 });
+
+describe('/api/asset content types', () => {
+  const u = encodeURIComponent('https://yce-us.s3-accelerate.amazonaws.com/x/mask.jpg');
+  test('only raster images pass, with nosniff', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('x', { headers: { 'Content-Type': 'image/png' } }));
+    const ok = await assetGET(req(`/api/asset?u=${u}`));
+    expect(ok.headers.get('X-Content-Type-Options')).toBe('nosniff');
+    for (const type of ['text/html', 'image/svg+xml', 'application/javascript']) {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('x', { headers: { 'Content-Type': type } }));
+      expect((await assetGET(req(`/api/asset?u=${u}`))).status).toBe(502);
+    }
+  });
+});

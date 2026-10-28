@@ -10,6 +10,7 @@ import { GOAL_INTENSITY, runGoal } from '@/lib/scan/runGoal';
 import { getBlob, saveTrial } from '@/lib/store/db';
 import { useBlobUrl } from '@/lib/store/useBlobUrl';
 import { useTrialData } from '@/lib/trials/useTrialData';
+import { goalPhase } from '@/lib/trials/goalPhase';
 import { baselineScan } from '@/lib/trials/view';
 import { getConcern } from '@/lib/verdict/concerns';
 import type { Trial, TrialGoal } from '@/lib/verdict/types';
@@ -25,7 +26,7 @@ function buildGoal(trial: Trial, photo: Blob): Promise<TrialGoal | null> {
   return p;
 }
 
-type Phase = 'loading' | 'building' | 'ready' | 'unsupported' | 'no-baseline' | 'error';
+type Phase = 'loading' | 'building' | 'ready' | 'unsupported' | 'no-baseline' | 'sample' | 'error';
 
 export default function GoalPage() {
   const { id } = useParams<{ id: string }>();
@@ -41,9 +42,8 @@ export default function GoalPage() {
   useEffect(() => {
     if (!data) return;
     const { trial } = data;
-    if (trial.goal) return setPhase('ready');
-    if (!trial.concerns.some(c => getConcern(c).simulable)) return setPhase('unsupported');
-    if (!baseline) return setPhase('no-baseline');
+    const next = goalPhase(trial, baseline !== null);
+    if (next !== 'build' || !baseline) return setPhase(next === 'build' ? 'no-baseline' : next);
     setPhase('building');
     (async () => {
       try {
@@ -137,6 +137,14 @@ export default function GoalPage() {
           <p className="mt-1 mb-5 text-sm text-ink-muted">
             Skin Simulation doesn&apos;t cover hydration, firmness or tear trough. Your verdict still works without it.
           </p>
+          {continueLink}
+        </Card>
+      )}
+
+      {phase === 'sample' && (
+        <Card>
+          <p className="font-semibold">The sample journey is read-only</p>
+          <p className="mt-1 mb-5 text-sm text-ink-muted">Start your own trial to build a goal from your photo.</p>
           {continueLink}
         </Card>
       )}

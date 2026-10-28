@@ -2,24 +2,28 @@
 
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { Camera, UploadSimple } from '@phosphor-icons/react';
+import { captureCrop } from '@/lib/image/crop';
 import { BRIGHTNESS_MIN, meanLuminance } from '@/lib/image/prep';
 import { createGate } from '@/lib/scan/gate';
 import { buttonClass } from './ui';
 
 type Mode = 'starting' | 'live' | 'fallback';
+/** 'picked' photos come from the device and may be old or already scanned. */
+export type PhotoSource = 'camera' | 'picked';
+type OnCapture = (file: Blob, source: PhotoSource) => void;
 
 /** Oval guide width as a share of the frame width; the API needs the face > 60% of width. */
 const OVAL_WIDTH = 0.7;
 const SAMPLE_MS = 500;
 
-function FilePicker({ onCapture, variant }: { onCapture: (f: Blob) => void; variant: 'primary' | 'ghost' }) {
+function FilePicker({ onCapture, variant }: { onCapture: OnCapture; variant: 'primary' | 'ghost' }) {
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) onCapture(file);
+    if (file) onCapture(file, 'picked');
     e.target.value = '';
   };
   return (
-    <label className={buttonClass(variant, 'w-full')}>
+    <label className={buttonClass(variant, 'w-full has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2')}>
       <UploadSimple aria-hidden size={20} weight="bold" />
       {variant === 'primary' ? 'Take or choose a selfie' : 'Upload a photo instead'}
       <input type="file" accept="image/*" capture="user" aria-label="Choose a selfie" className="sr-only" onChange={onChange} />
@@ -28,7 +32,7 @@ function FilePicker({ onCapture, variant }: { onCapture: (f: Blob) => void; vari
 }
 
 /** Front-camera capture with an oval guide and a live light check; falls back to a file picker. */
-export function CameraCapture({ onCapture }: { onCapture: (file: Blob) => void }) {
+export function CameraCapture({ onCapture }: { onCapture: OnCapture }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [mode, setMode] = useState<Mode>('starting');
   const [tooDark, setTooDark] = useState(false);
@@ -69,7 +73,7 @@ export function CameraCapture({ onCapture }: { onCapture: (file: Blob) => void }
     const id = window.setInterval(() => {
       const v = videoRef.current;
       if (!v || !ctx || !v.videoWidth) return;
-      const crop = centerCrop(v.videoWidth, v.videoHeight);
+      const crop = captureCrop(v.videoWidth, v.videoHeight);
       const ow = crop.w * OVAL_WIDTH;
       ctx.drawImage(v, crop.x + (crop.w - ow) / 2, crop.y + crop.h * 0.15, ow, crop.h * 0.7, 0, 0, 48, 64);
       setTooDark(meanLuminance(ctx.getImageData(0, 0, 48, 64).data) < BRIGHTNESS_MIN);
@@ -85,14 +89,14 @@ export function CameraCapture({ onCapture }: { onCapture: (file: Blob) => void }
       .run(
         () =>
           new Promise<void>(resolve => {
-            const crop = centerCrop(v.videoWidth, v.videoHeight);
+            const crop = captureCrop(v.videoWidth, v.videoHeight);
             const canvas = document.createElement('canvas');
             canvas.width = crop.w;
             canvas.height = crop.h;
             canvas.getContext('2d')!.drawImage(v, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
             canvas.toBlob(
               b => {
-                if (b) onCapture(b);
+                if (b) onCapture(b, 'camera');
                 resolve();
               },
               'image/jpeg',
@@ -170,9 +174,3 @@ export function CameraCapture({ onCapture }: { onCapture: (file: Blob) => void }
   );
 }
 
-/** Largest centered 3:4 portrait crop of a w×h frame. */
-function centerCrop(w: number, h: number) {
-  const targetW = Math.min(w, (h * 3) / 4);
-  const targetH = (targetW * 4) / 3;
-  return { x: (w - targetW) / 2, y: (h - targetH) / 2, w: targetW, h: targetH };
-}

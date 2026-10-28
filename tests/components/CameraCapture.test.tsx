@@ -32,5 +32,5 @@ test('choosing a file calls onCapture with it', async () => {
   const file = new File([new Uint8Array([1])], 'me.jpg', { type: 'image/jpeg' });
   const { fireEvent } = await import('@testing-library/react');
   fireEvent.change(input, { target: { files: [file] } });
-  expect(onCapture).toHaveBeenCalledWith(file);
+  expect(onCapture).toHaveBeenCalledWith(file, 'picked');
 });

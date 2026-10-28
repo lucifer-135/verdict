@@ -77,7 +77,7 @@ function ImportFlow() {
       />
 
       {phase === 'pick' && (
-        <label className={buttonClass(items.length ? 'secondary' : 'primary', 'w-full')}>
+        <label className={buttonClass(items.length ? 'secondary' : 'primary', 'w-full has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2')}>
           {reading ? <CircleNotch aria-hidden size={20} weight="bold" className="animate-spin" /> : <Images aria-hidden size={20} weight="bold" />}
           {reading ? 'Reading photos…' : items.length ? 'Add more photos' : 'Choose photos'}
           <input type="file" accept="image/*" multiple className="sr-only" onChange={pick} disabled={reading} />

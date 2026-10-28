@@ -3,11 +3,12 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowsClockwise, Check, CircleNotch, WarningCircle } from '@phosphor-icons/react';
-import { CameraCapture } from '@/components/CameraCapture';
+import { CameraCapture, type PhotoSource } from '@/components/CameraCapture';
 import { Button, Card, PageHeader } from '@/components/ui';
 import { createGate } from '@/lib/scan/gate';
 import { ScanError } from '@/lib/scan/poll';
-import { resumeScan, runScan, type ScanStatus } from '@/lib/scan/runScan';
+import { checkPickedPhoto } from '@/lib/scan/pickedPhoto';
+import { resumeScan, runScan, type ScanOptions, type ScanStatus } from '@/lib/scan/runScan';
 import { getTrial } from '@/lib/store/db';
 import type { Trial } from '@/lib/verdict/types';
 
@@ -20,10 +21,13 @@ const STEPS: { status: ScanStatus; label: string }[] = [
 
 const TIPS = ['Face a window or soft light', 'Glasses off, hair off your forehead', 'Bare skin, neutral expression'];
 
+/** Where the photo came from; a picked photo carries its hash and EXIF date into the saved scan. */
+type PhotoInfo = Pick<ScanOptions, 'source' | 'sourceHash' | 'takenAt'>;
+
 type Phase =
   | { kind: 'capture' }
   | { kind: 'working'; status: ScanStatus }
-  | { kind: 'error'; error: ScanError; file: Blob };
+  | { kind: 'error'; error: ScanError; file: Blob; origin: PhotoInfo };
 
 function Progress({ status }: { status: ScanStatus }) {
   const current = STEPS.findIndex(s => s.status === status);
@@ -61,15 +65,30 @@ function ScanFlow() {
   const gate = useRef(createGate());
 
   useEffect(() => {
-    if (trialId) getTrial(trialId).then(t => setTrial(t ?? null));
+    if (trialId) getTrial(trialId).then(t => setTrial(t ?? null), () => setTrial(null));
   }, [trialId]);
 
-  function run(file: Blob, resumeTaskId?: string) {
-    return gate.current.run(() => scan(file, resumeTaskId));
+  function capture(file: Blob, from: PhotoSource) {
+    return gate.current.run(async () => {
+      let origin: PhotoInfo = { source: 'camera' };
+      if (from === 'picked') {
+        try {
+          const { sourceHash, takenAt } = await checkPickedPhoto(file);
+          origin = { source: takenAt ? 'import' : 'camera', sourceHash, takenAt };
+        } catch (e) {
+          return setPhase({ kind: 'error', error: e instanceof ScanError ? e : new ScanError('unknown'), file, origin });
+        }
+      }
+      return scan(file, origin);
+    });
   }
 
-  async function scan(file: Blob, resumeTaskId?: string) {
-    const opts = { source: 'camera' as const, onStatus: (status: ScanStatus) => setPhase({ kind: 'working', status }) };
+  function resume(file: Blob, origin: PhotoInfo, taskId: string) {
+    return gate.current.run(() => scan(file, origin, taskId));
+  }
+
+  async function scan(file: Blob, origin: PhotoInfo, resumeTaskId?: string) {
+    const opts: ScanOptions = { ...origin, onStatus: status => setPhase({ kind: 'working', status }) };
     try {
       setPhase({ kind: 'working', status: resumeTaskId ? 'analyzing' : 'preparing' });
       const scan = resumeTaskId ? await resumeScan(resumeTaskId, file, opts) : await runScan(file, opts);
@@ -77,7 +96,7 @@ function ScanFlow() {
       else if (trialId) router.push(`/trial/${trialId}`);
       else router.push(`/scan/${scan.id}`);
     } catch (e) {
-      setPhase({ kind: 'error', error: e instanceof ScanError ? e : new ScanError('unknown'), file });
+      setPhase({ kind: 'error', error: e instanceof ScanError ? e : new ScanError('unknown'), file, origin });
     }
   }
 
@@ -102,7 +121,7 @@ function ScanFlow() {
               </li>
             ))}
           </ul>
-          <CameraCapture onCapture={file => run(file)} />
+          <CameraCapture onCapture={capture} />
         </>
       )}
 
@@ -125,7 +144,7 @@ function ScanFlow() {
           </div>
           <div className="mt-5 space-y-3">
             {resumable && (
-              <Button className="w-full" onClick={() => run(phase.file, phase.error.taskId)}>
+              <Button className="w-full" onClick={() => phase.error.taskId && resume(phase.file, phase.origin, phase.error.taskId)}>
                 <ArrowsClockwise aria-hidden size={18} weight="bold" />
                 Keep waiting
               </Button>

@@ -29,7 +29,7 @@ function Layer({ side }: { side: CompareSide }) {
 export function CompareSlider({ left, right }: { left: CompareSide; right: CompareSide }) {
   const [pos, setPos] = useState(50);
   return (
-    <div className="relative aspect-[3/4] select-none overflow-hidden rounded-3xl bg-muted shadow-lift">
+    <div className="relative aspect-[3/4] select-none overflow-hidden rounded-3xl bg-muted shadow-lift has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2">
       <Layer side={right} />
       <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
         <Layer side={left} />

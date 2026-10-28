@@ -1,5 +1,6 @@
 import { IDBFactory } from 'fake-indexeddb';
 import {
+  deleteScan,
   findScanByHash,
   getBlob,
   getScan,
@@ -63,3 +64,23 @@ test('db round-trips trials and blobs', async () => {
 
 test('isStorageAvailable is true when IndexedDB works', async () =>
   expect(await isStorageAvailable()).toBe(true));
+
+test('deleteScan removes the scan, its photo and its masks', async () => {
+  const photoId = await putBlob(new Blob(['p']));
+  const maskId = await putBlob(new Blob(['m']));
+  await saveScan({ ...scan('a', '2026-09-01T09:00:00.000Z'), photoBlobId: photoId, maskBlobIds: { oiliness: maskId } });
+  await deleteScan('a');
+  expect(await getScan('a')).toBeUndefined();
+  expect(await getBlob(photoId)).toBeUndefined();
+  expect(await getBlob(maskId)).toBeUndefined();
+});
+
+test('connections are closed after each call, so a newer schema version can open', async () => {
+  await saveScan(scan('a', '2026-09-01T09:00:00.000Z'));
+  const { openDB } = await import('idb');
+  const upgraded = await Promise.race([
+    openDB('verdict', 2).then(db => (db.close(), 'opened')),
+    new Promise(r => setTimeout(() => r('blocked'), 500)),
+  ]);
+  expect(upgraded).toBe('opened');
+});

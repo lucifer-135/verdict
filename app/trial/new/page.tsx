@@ -18,6 +18,7 @@ function DetailsStep({ onSaved }: { onSaved: (t: Trial) => void }) {
   const [startDate, setStartDate] = useState(() => format(new Date(), 'yyyy-MM-dd'));
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   const nameError = !name.trim() ? 'Name the product you are testing.' : null;
   const concernError = concerns.length === 0 ? 'Pick at least one thing it should improve.' : null;
@@ -42,8 +43,13 @@ function DetailsStep({ onSaved }: { onSaved: (t: Trial) => void }) {
       isSample: false,
       archived: false,
     };
-    await saveTrial(trial);
-    onSaved(trial);
+    try {
+      await saveTrial(trial);
+      onSaved(trial);
+    } catch {
+      setSaving(false);
+      setSaveError(true);
+    }
   }
 
   return (
@@ -113,6 +119,11 @@ function DetailsStep({ onSaved }: { onSaved: (t: Trial) => void }) {
         </p>
       </div>
 
+      {saveError && (
+        <p role="alert" className="text-sm text-rose-700">
+          The trial could not be saved in this browser. Please check that site storage is allowed and try again.
+        </p>
+      )}
       <Button type="submit" className="w-full" disabled={saving}>
         Continue
         <ArrowRight aria-hidden size={18} weight="bold" />

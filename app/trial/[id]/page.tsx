@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type KeyboardEvent } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { format, parseISO } from 'date-fns';
 import { Camera, CaretRight, Sparkle, Warning } from '@phosphor-icons/react';
 import { CompareSlider } from '@/components/CompareSlider';
 import { Disclaimer } from '@/components/Disclaimer';
 import { SampleBadge } from '@/components/SampleBadge';
 import { TrendChart } from '@/components/TrendChart';
-import { ButtonLink, Card, PageHeader } from '@/components/ui';
+import { Button, ButtonLink, Card, PageHeader } from '@/components/ui';
+import { saveTrial } from '@/lib/store/db';
 import { VerdictCard } from '@/components/VerdictCard';
 import { useBlobUrl } from '@/lib/store/useBlobUrl';
 import { chartData } from '@/lib/trials/chartData';
@@ -33,6 +34,7 @@ function Section({ title, children, hint }: { title: string; hint?: string; chil
 export default function TrialPage() {
   const { id } = useParams<{ id: string }>();
   const { data } = useTrialData(id);
+  const router = useRouter();
   const [picked, setPicked] = useState<ConcernId | null>(null);
   const [pair, setPair] = useState<Pair>('before-now');
   const [showMask, setShowMask] = useState(false);
@@ -84,6 +86,12 @@ export default function TrialPage() {
         subtitle={trial.concerns.map(c => getConcern(c).label).join(' · ')}
       />
 
+      {trial.isSample && (
+        <p className="mb-4 rounded-xl bg-accent-soft px-4 py-3 text-sm text-[#5c2f21]">
+          This sample uses AI-generated photos to show how a trial works. It does not show a real user.
+        </p>
+      )}
+
       <VerdictCard verdict={verdict} />
 
       {!trial.isSample && (
@@ -95,11 +103,26 @@ export default function TrialPage() {
 
       <Section title="Trend" hint="Raw scores from each scan. Moves inside the shaded band are normal scan noise.">
         {trial.concerns.length > 1 && (
-          <div role="tablist" aria-label="Concern" className="mb-4 flex gap-1 rounded-xl bg-muted p-1">
+          <div
+            role="tablist"
+            aria-label="Concern"
+            onKeyDown={(e: KeyboardEvent) => {
+              const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+              if (!step) return;
+              const list = trial.concerns;
+              const next = list[(list.indexOf(concern) + step + list.length) % list.length];
+              setPicked(next);
+              document.getElementById(`tab-${next}`)?.focus();
+            }}
+            className="mb-4 flex gap-1 rounded-xl bg-muted p-1"
+          >
             {trial.concerns.map(c => (
               <button
                 key={c}
                 role="tab"
+                id={`tab-${c}`}
+                aria-controls="trend-panel"
+                tabIndex={c === concern ? 0 : -1}
                 aria-selected={c === concern}
                 onClick={() => setPicked(c)}
                 className={`min-h-10 flex-1 cursor-pointer rounded-lg px-2 text-sm font-semibold transition-colors duration-150 ${
@@ -111,7 +134,9 @@ export default function TrialPage() {
             ))}
           </div>
         )}
-        <TrendChart data={series} label={getConcern(concern).label} />
+        <div id="trend-panel" role="tabpanel" aria-labelledby={trial.concerns.length > 1 ? `tab-${concern}` : undefined}>
+          <TrendChart data={series} label={getConcern(concern).label} />
+        </div>
       </Section>
 
       {scans.length > 0 && (
@@ -195,6 +220,20 @@ export default function TrialPage() {
           </ol>
         )}
       </Section>
+
+      {!trial.isSample && (
+        <Button
+          variant="ghost"
+          className="mt-6 w-full"
+          onClick={async () => {
+            if (!window.confirm(`Archive ${trial.productName}? It will leave your shelf. Its scans stay in your history.`)) return;
+            await saveTrial({ ...trial, archived: true });
+            router.push('/');
+          }}
+        >
+          Archive this trial
+        </Button>
+      )}
 
       <Disclaimer />
     </section>

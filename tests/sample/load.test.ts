@@ -68,3 +68,13 @@ test('hasSampleJourney is false for an empty journey', () => {
   expect(hasSampleJourney(journey)).toBe(true);
   expect(hasSampleJourney({ ...journey, scans: [] })).toBe(false);
 });
+
+test('a load that fails partway can be retried without duplicate scans', async () => {
+  fetchMock.mockImplementationOnce(async () => new Response(new Uint8Array([1]), { headers: { 'Content-Type': 'image/jpeg' } }));
+  fetchMock.mockImplementationOnce(async () => new Response(new Uint8Array([1]), { headers: { 'Content-Type': 'image/jpeg' } }));
+  fetchMock.mockImplementationOnce(async () => new Response('gone', { status: 404 }));
+  await expect(loadSampleJourney(journey)).rejects.toThrow();
+  await loadSampleJourney(journey);
+  expect(await listScans()).toHaveLength(2);
+  expect(await listTrials()).toHaveLength(1);
+});

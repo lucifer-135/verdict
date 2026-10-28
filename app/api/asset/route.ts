@@ -18,12 +18,17 @@ export async function GET(req: Request) {
   } catch {
     return errorResponse(502, 'asset_fetch_failed');
   }
-  if (!upstream.ok || !upstream.body) return errorResponse(502, 'asset_fetch_failed');
+  // Served from our origin, so only raster images pass: no HTML, script or SVG.
+  const type = upstream.headers.get('Content-Type') ?? '';
+  if (!upstream.ok || !upstream.body || !/^image\/(jpeg|png|webp)\b/.test(type)) {
+    return errorResponse(502, 'asset_fetch_failed');
+  }
 
   return new Response(upstream.body, {
     headers: {
-      'Content-Type': upstream.headers.get('Content-Type') ?? 'application/octet-stream',
+      'Content-Type': type,
       'Cache-Control': 'private, max-age=3600',
+      'X-Content-Type-Options': 'nosniff',
     },
   });
 }

@@ -171,7 +171,7 @@ export function computeVerdict(trial: Trial, scans: Scan[], otherTrials: Trial[]
     reason =
       daysIn < MIN_DAYS
         ? `Too early to judge. First fair read on ${fmtDate(addDays(start, MIN_DAYS))}.`
-        : 'Too early to judge. Your first fair read comes after your next check-in.';
+        : `Too early to judge. Your first fair read comes after your next ${postCount === 0 ? 'two check-ins' : 'check-in'}.`;
   } else {
     const kinds = settled.map(s => s.kind);
     kind = kinds.includes('working') ? 'working' : kinds.includes('give_it_time') ? 'give_it_time' : 'not_moving';

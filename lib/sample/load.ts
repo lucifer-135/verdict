@@ -35,13 +35,15 @@ async function storeAsset(path: string): Promise<string> {
 export async function loadSampleJourney(journey: SampleJourney = BUNDLED): Promise<string> {
   if ((await listTrials()).some(t => t.id === SAMPLE_TRIAL_ID)) return SAMPLE_TRIAL_ID;
 
-  for (const s of journey.scans) {
+  // Fixed ids: a retry after a failed load overwrites the earlier scans instead of duplicating them.
+  // The trial is saved last, so a partial load is retried rather than treated as done.
+  for (const [i, s] of journey.scans.entries()) {
     const maskBlobIds: Scan['maskBlobIds'] = {};
     for (const [concern, path] of Object.entries(s.masks) as [ConcernId, string][]) {
       maskBlobIds[concern] = await storeAsset(path);
     }
     await saveScan({
-      id: crypto.randomUUID(),
+      id: `${SAMPLE_TRIAL_ID}-scan-${i + 1}`,
       takenAt: s.takenAt,
       source: 'sample',
       sourceHash: null,
