@@ -42,7 +42,7 @@ async function upload(bytes: Uint8Array, contentType: string, fileName: string) 
   });
   const file = init.data.files[0];
   const req = file.requests[0];
-  const put = await fetch(req.url, { method: req.method, headers: req.headers, body: bytes });
+  const put = await fetch(req.url, { method: req.method, headers: req.headers, body: bytes as BodyInit });
   log('PUT presigned', put.status);
   return { init, fileId: file.file_id as string };
 }

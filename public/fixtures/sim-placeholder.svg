@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800" viewBox="0 0 600 800">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6efe9"/>
+      <stop offset="1" stop-color="#e7d8cc"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#g)"/>
+  <ellipse cx="300" cy="360" rx="170" ry="230" fill="#f1dccb" stroke="#d9bfa9" stroke-width="4"/>
+  <text x="300" y="690" text-anchor="middle" font-family="sans-serif" font-size="28" fill="#8a7464">Simulated goal (mock mode)</text>
+</svg>

@@ -58,3 +58,7 @@ export function getConcern(id: ConcernId): ConcernInfo {
   if (!c) throw new Error(`Unknown concern: ${id}`);
   return c;
 }
+
+export function isConcernId(value: string): value is ConcernId {
+  return BY_ID.has(value as ConcernId);
+}

@@ -1,4 +1,4 @@
-import { CONCERNS, SD_ACTIONS, TARGETABLE, getConcern } from '@/lib/verdict/concerns';
+import { CONCERNS, SD_ACTIONS, TARGETABLE, getConcern, isConcernId } from '@/lib/verdict/concerns';
 
 test('catalog has 16 SD concerns', () => {
   expect(SD_ACTIONS).toHaveLength(16);
@@ -41,4 +41,10 @@ test('simulation keys map to the Skin Simulation API names', () => {
   expect(getConcern('moisture').simKey).toBeNull();
   expect(CONCERNS.filter(c => c.simKey !== null).every(c => c.simulable)).toBe(true);
   expect(CONCERNS.filter(c => c.simulable).every(c => c.simKey !== null)).toBe(true);
+});
+
+test('isConcernId accepts only SD concern names', () => {
+  expect(isConcernId('oiliness')).toBe(true);
+  expect(isConcernId('all')).toBe(false);
+  expect(isConcernId('hd_pore')).toBe(false);
 });
