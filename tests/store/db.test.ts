@@ -1,5 +1,6 @@
 import { IDBFactory } from 'fake-indexeddb';
 import {
+  clearAllData,
   deleteScan,
   findScanByHash,
   getBlob,
@@ -83,4 +84,14 @@ test('connections are closed after each call, so a newer schema version can open
     new Promise(r => setTimeout(() => r('blocked'), 500)),
   ]);
   expect(upgraded).toBe('opened');
+});
+
+test('clearAllData removes every scan, trial and stored image', async () => {
+  const photoId = await putBlob(new Blob(['p']));
+  await saveScan({ ...scan('a', '2026-09-01T09:00:00.000Z'), photoBlobId: photoId });
+  await saveTrial(trial);
+  await clearAllData();
+  expect(await listScans()).toEqual([]);
+  expect(await listTrials()).toEqual([]);
+  expect(await getBlob(photoId)).toBeUndefined();
 });

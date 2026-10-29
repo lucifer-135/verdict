@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { CalendarCheck, Camera, Scales } from '@phosphor-icons/react';
+import { ConfirmButton } from '@/components/ConfirmButton';
 import { Disclaimer } from '@/components/Disclaimer';
 import { TrialCard } from '@/components/TrialCard';
 import { Button, ButtonLink, PageHeader } from '@/components/ui';
 import { VerdictChip } from '@/components/VerdictChip';
 import { hasSampleJourney, loadSampleJourney } from '@/lib/sample/load';
-import { listScans, listTrials } from '@/lib/store/db';
+import { clearAllData, listScans, listTrials } from '@/lib/store/db';
 import { activeTrials, evaluationDate, nextCheckIn, scansForTrial } from '@/lib/trials/view';
 import { computeVerdict } from '@/lib/verdict/engine';
 import type { Scan, Trial } from '@/lib/verdict/types';
@@ -19,7 +20,7 @@ const STEPS = [
   { icon: Scales, title: 'Get a verdict', body: 'Keep going, give it time, or stop.' },
 ];
 
-function EmptyShelf() {
+function EmptyShelf({ footer }: { footer?: ReactNode }) {
   return (
     <section className="animate-rise">
       <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary">Skincare, judged by your skin</p>
@@ -68,6 +69,7 @@ function EmptyShelf() {
         </ButtonLink>
         <SampleButton variant="secondary" />
       </div>
+      {footer}
       <Disclaimer />
     </section>
   );
@@ -120,15 +122,36 @@ function ShelfSkeleton() {
 export default function ShelfPage() {
   const [data, setData] = useState<{ trials: Trial[]; scans: Scan[] } | null>(null);
 
+  const load = useCallback(
+    () =>
+      Promise.all([listTrials(), listScans()])
+        .then(([trials, scans]) => setData({ trials, scans }))
+        .catch(() => setData({ trials: [], scans: [] })),
+    [],
+  );
   useEffect(() => {
-    Promise.all([listTrials(), listScans()])
-      .then(([trials, scans]) => setData({ trials, scans }))
-      .catch(() => setData({ trials: [], scans: [] }));
-  }, []);
+    load();
+  }, [load]);
 
   if (!data) return <ShelfSkeleton />;
   const trials = activeTrials(data.trials);
-  if (trials.length === 0) return <EmptyShelf />;
+  // Archived trials and their scans stay stored, so reset is offered whenever anything is saved.
+  const reset =
+    data.trials.length > 0 || data.scans.length > 0 ? (
+      <div className="mt-10 border-t border-line pt-6">
+        <ConfirmButton
+          label="Reset all data"
+          question="Delete every trial, scan and photo saved in this browser? This cannot be undone."
+          confirmLabel="Reset"
+          className="text-rose-700 hover:bg-rose-50"
+          onConfirm={async () => {
+            await clearAllData();
+            await load();
+          }}
+        />
+      </div>
+    ) : null;
+  if (trials.length === 0) return <EmptyShelf footer={reset} />;
 
   const today = new Date();
   const hasRealTrial = trials.some(t => !t.isSample);
@@ -162,6 +185,7 @@ export default function ShelfPage() {
         </ButtonLink>
         <SampleButton variant="ghost" />
       </div>
+      {reset}
       <Disclaimer />
     </section>
   );

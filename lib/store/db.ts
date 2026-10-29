@@ -93,6 +93,18 @@ export async function getBlob(id: string): Promise<Blob | undefined> {
   return stored ? new Blob([stored.bytes], { type: stored.type }) : undefined;
 }
 
+/**
+ * Remove every scan, trial and stored image. Clears the stores instead of deleting
+ * the database, which would wait forever if another tab still has it open.
+ */
+export function clearAllData(): Promise<void> {
+  return withDb(async db => {
+    const tx = db.transaction(['scans', 'trials', 'blobs'], 'readwrite');
+    await Promise.all([tx.objectStore('scans').clear(), tx.objectStore('trials').clear(), tx.objectStore('blobs').clear()]);
+    await tx.done;
+  });
+}
+
 /** False in browsers that block IndexedDB (e.g. some private modes). */
 export async function isStorageAvailable(): Promise<boolean> {
   try {
