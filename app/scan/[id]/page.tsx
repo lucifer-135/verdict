@@ -52,11 +52,11 @@ export default function ScanReportPage() {
           // eslint-disable-next-line @next/next/no-img-element -- local object URL
           <img src={photo} alt="Your scan photo" className="h-full w-full object-cover" />
         )}
-        {mask && (
+        {selected && mask && (
           // eslint-disable-next-line @next/next/no-img-element -- local object URL
           <img
             src={mask}
-            alt={`${getConcern(selected!).label} map`}
+            alt={`${getConcern(selected).label} map`}
             className="absolute inset-0 h-full w-full object-cover mix-blend-multiply"
           />
         )}
