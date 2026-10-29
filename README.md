@@ -115,7 +115,7 @@ lib/youcam/          YouCam client, mock client, error messages, asset allowlist
 lib/scan/            Client-side scan, goal and import flows
 lib/store/           IndexedDB storage
 tests/               Vitest tests
-docs/                Design spec, implementation plan, API notes, submission drafts
+docs/                API notes and screenshots
 ```
 
 ## Limitations

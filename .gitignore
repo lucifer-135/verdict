@@ -60,3 +60,7 @@ HANDOFF.md
 
 # Claude Code local config
 .claude/
+
+# planning docs and submission drafts stay local
+docs/superpowers/
+docs/submission.md
