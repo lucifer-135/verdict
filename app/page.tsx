@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { CalendarCheck, Camera, Scales } from '@phosphor-icons/react';
 import { ConfirmButton } from '@/components/ConfirmButton';
+import { InstallButton } from '@/components/InstallButton';
 import { Disclaimer } from '@/components/Disclaimer';
 import { TrialCard } from '@/components/TrialCard';
 import { Button, ButtonLink, PageHeader } from '@/components/ui';
@@ -68,6 +69,7 @@ function EmptyShelf({ footer }: { footer?: ReactNode }) {
           Start a trial
         </ButtonLink>
         <SampleButton variant="secondary" />
+        <InstallButton />
       </div>
       {footer}
       <Disclaimer />
@@ -184,6 +186,7 @@ export default function ShelfPage() {
           Start {hasRealTrial ? 'another' : 'a'} trial
         </ButtonLink>
         <SampleButton variant="ghost" />
+        <InstallButton />
       </div>
       {reset}
       <Disclaimer />

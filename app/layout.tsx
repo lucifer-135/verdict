@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import { Figtree, Newsreader } from 'next/font/google';
 import { Scales } from '@phosphor-icons/react/dist/ssr';
+import { OfflineBanner } from '@/components/OfflineBanner';
+import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
 import { StorageBanner } from '@/components/StorageBanner';
 import './globals.css';
 
@@ -12,6 +14,9 @@ export const metadata: Metadata = {
   title: 'Verdict — Is your skincare actually working?',
   description:
     'Track a skincare product with repeat YouCam Skin AI scans and get a noise-aware verdict: keep going, give it time, or stop.',
+  applicationName: 'Verdict',
+  appleWebApp: { capable: true, title: 'Verdict', statusBarStyle: 'default' },
+  icons: { icon: '/icons/icon-192.png', apple: '/icons/apple-touch-icon.png' },
 };
 
 export const viewport: Viewport = {
@@ -24,6 +29,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${figtree.variable} ${newsreader.variable}`}>
       <body className="min-h-dvh antialiased">
+        <ServiceWorkerRegistration />
+        <OfflineBanner />
         <StorageBanner />
         <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col px-4 pb-10">
           <nav className="flex h-14 items-center justify-between" aria-label="Main">
