@@ -1,4 +1,4 @@
-import { activeTrials, baselineScan, evaluationDate, latestRealScan, nextCheckIn, scansForTrial } from '@/lib/trials/view';
+import { activeTrials, archivedTrials, baselineScan, evaluationDate, latestRealScan, nextCheckIn, scansForTrial } from '@/lib/trials/view';
 import type { Scan, ScanSource, Trial } from '@/lib/verdict/types';
 
 const scan = (source: ScanSource, takenAt = '2026-09-01T09:00:00.000Z'): Scan => ({
@@ -53,6 +53,15 @@ test('activeTrials drops archived, newest first, sample last', () => {
     trial({ id: 'new', createdAt: '2026-09-20T00:00:00.000Z' }),
   ]);
   expect(list.map(t => t.id)).toEqual(['new', 'old', 'sample']);
+});
+
+test('archivedTrials keeps only archived trials, newest first', () => {
+  const list = archivedTrials([
+    trial({ id: 'live', createdAt: '2026-09-01T00:00:00.000Z' }),
+    trial({ id: 'older', archived: true, createdAt: '2026-08-01T00:00:00.000Z' }),
+    trial({ id: 'newer', archived: true, createdAt: '2026-09-15T00:00:00.000Z' }),
+  ]);
+  expect(list.map(t => t.id)).toEqual(['newer', 'older']);
 });
 
 describe('final-review fixes', () => {

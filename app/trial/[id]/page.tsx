@@ -12,7 +12,7 @@ import { TrendChart } from '@/components/TrendChart';
 import { ConfirmButton } from '@/components/ConfirmButton';
 import { CostEditor } from '@/components/CostEditor';
 import { ShareButton } from '@/components/ShareButton';
-import { ButtonLink, Card, PageHeader } from '@/components/ui';
+import { Button, ButtonLink, Card, PageHeader } from '@/components/ui';
 import { saveTrial } from '@/lib/store/db';
 import { VerdictCard } from '@/components/VerdictCard';
 import { useBlobUrl } from '@/lib/store/useBlobUrl';
@@ -236,7 +236,20 @@ export default function TrialPage() {
         )}
       </Section>
 
-      {!trial.isSample && (
+      {!trial.isSample && trial.archived && (
+        <Button
+          variant="secondary"
+          className="mt-6 w-full"
+          onClick={async () => {
+            await saveTrial({ ...trial, archived: false });
+            await reload();
+          }}
+        >
+          Put back on shelf
+        </Button>
+      )}
+
+      {!trial.isSample && !trial.archived && (
         <div className="mt-6">
           <ConfirmButton
             label="Archive this trial"

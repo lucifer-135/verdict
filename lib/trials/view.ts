@@ -25,6 +25,11 @@ export function activeTrials(all: Trial[]): Trial[] {
     .sort((a, b) => Number(a.isSample) - Number(b.isSample) || b.createdAt.localeCompare(a.createdAt));
 }
 
+/** Archived trials, newest first. They stay stored so they can be put back on the shelf. */
+export function archivedTrials(all: Trial[]): Trial[] {
+  return all.filter(t => t.archived).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
 /**
  * The scan that represents this trial's starting point: the latest one in
  * [start − 14 days, start + 3 days], else the first one after that window.

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { CalendarCheck, Camera, Scales } from '@phosphor-icons/react';
+import { ArchivedTrials } from '@/components/ArchivedTrials';
 import { ConfirmButton } from '@/components/ConfirmButton';
 import { InstallButton } from '@/components/InstallButton';
 import { Disclaimer } from '@/components/Disclaimer';
@@ -10,8 +11,8 @@ import { TrialCard } from '@/components/TrialCard';
 import { Button, ButtonLink, PageHeader } from '@/components/ui';
 import { VerdictChip } from '@/components/VerdictChip';
 import { hasSampleJourney, loadSampleJourney } from '@/lib/sample/load';
-import { clearAllData, listScans, listTrials } from '@/lib/store/db';
-import { activeTrials, evaluationDate, nextCheckIn, scansForTrial } from '@/lib/trials/view';
+import { clearAllData, listScans, listTrials, saveTrial } from '@/lib/store/db';
+import { activeTrials, archivedTrials, evaluationDate, nextCheckIn, scansForTrial } from '@/lib/trials/view';
 import { computeVerdict } from '@/lib/verdict/engine';
 import type { Scan, Trial } from '@/lib/verdict/types';
 
@@ -137,6 +138,15 @@ export default function ShelfPage() {
 
   if (!data) return <ShelfSkeleton />;
   const trials = activeTrials(data.trials);
+  const archived = (
+    <ArchivedTrials
+      trials={archivedTrials(data.trials)}
+      onRestore={async trial => {
+        await saveTrial({ ...trial, archived: false });
+        await load();
+      }}
+    />
+  );
   // Archived trials and their scans stay stored, so reset is offered whenever anything is saved.
   const reset =
     data.trials.length > 0 || data.scans.length > 0 ? (
@@ -153,7 +163,17 @@ export default function ShelfPage() {
         />
       </div>
     ) : null;
-  if (trials.length === 0) return <EmptyShelf footer={reset} />;
+  if (trials.length === 0)
+    return (
+      <EmptyShelf
+        footer={
+          <>
+            {archived}
+            {reset}
+          </>
+        }
+      />
+    );
 
   const today = new Date();
   const hasRealTrial = trials.some(t => !t.isSample);
@@ -188,6 +208,7 @@ export default function ShelfPage() {
         <SampleButton variant="ghost" />
         <InstallButton />
       </div>
+      {archived}
       {reset}
       <Disclaimer />
     </section>
