@@ -82,15 +82,17 @@ The app is designed for [Vercel](https://vercel.com). Import this repository, se
 
 | Start | Verdict | Trend |
 |---|---|---|
-| <img src="docs/screenshots/phone/01-empty-shelf.png" width="240" alt="Start screen with an example verdict"> | <img src="docs/screenshots/phone/02-trial-verdict.png" width="240" alt="Trial page with a Working verdict"> | <img src="docs/screenshots/phone/03-trend.png" width="240" alt="Trend chart with noise band and goal line"> |
+| <img src="docs/screenshots/phone/01-empty-shelf.png" width="240" alt="Start screen with an example verdict"> | <img src="docs/screenshots/phone/02-trial-verdict.png" width="240" alt="Trial page with a Working verdict, its monthly cost and a share button"> | <img src="docs/screenshots/phone/03-trend.png" width="240" alt="Trend chart with noise band and goal line"> |
 | **Heatmap comparison** | **Realistic goal** | **Skin report** |
 | <img src="docs/screenshots/phone/04-compare-heatmap.png" width="240" alt="Before and now comparison with the breakouts heatmap"> | <img src="docs/screenshots/phone/05-goal.png" width="240" alt="Before and simulated goal comparison"> | <img src="docs/screenshots/phone/06-skin-report.png" width="240" alt="Skin report with concern scores"> |
 | **Shelf** | **New trial** | **Check-in** |
-| <img src="docs/screenshots/phone/07-shelf.png" width="240" alt="Shelf with active trials"> | <img src="docs/screenshots/phone/08-new-trial.png" width="240" alt="New trial form"> | <img src="docs/screenshots/phone/09-check-in.png" width="240" alt="Weekly check-in screen"> |
+| <img src="docs/screenshots/phone/07-shelf.png" width="240" alt="Shelf with a real trial and the sample trial"> | <img src="docs/screenshots/phone/08-new-trial.png" width="240" alt="New trial form with concerns and price"> | <img src="docs/screenshots/phone/09-check-in.png" width="240" alt="Weekly check-in camera with the last photo as a guide"> |
 
 Gallery images in a 3:2 ratio are in [docs/screenshots/](docs/screenshots/):
 
 ![YouCam Skin Analysis heatmaps and a realistic goal built with YouCam Skin Simulation](docs/screenshots/gallery-2-youcam.png)
+
+![A shared verdict image without a face photo, archived trials, and the shelf working offline](docs/screenshots/gallery-4-everyday.png)
 
 ## Tests and checks
 
