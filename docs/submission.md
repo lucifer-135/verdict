@@ -37,6 +37,8 @@ Verdict turns YouCam AI Skin Analysis into a product trial.
 
 The five verdicts are **Working**, **Give it time**, **Not moving**, **Pause** (possible irritation) and **Too early**. The trial page also shows a trend chart with the noise band and the goal line, a before-and-now comparison with the YouCam heatmap for the selected concern, a side-effect watch for other concerns, and a warning when two products target the same concern at the same time.
 
+The app includes a **simulated sample journey** so that judges can see a full six-week trial without waiting six weeks. It uses AI-generated photos of one person, which we analyzed with the real YouCam API: breakouts improved from a raw score of 50 to 77, and the verdict is **Working** with high confidence. The app labels this trial as a simulated sample and states that it does not show a real user.
+
 ## How we built it
 
 - **Next.js 15, React 19, TypeScript and Tailwind CSS**, designed mobile-first for phone browsers.
@@ -75,6 +77,16 @@ The five verdicts are **Working**, **Give it time**, **Not moving**, **Pause** (
 ### Built with (tags)
 
 next.js, react, typescript, tailwind-css, youcam-api, youcam-skin-analysis, youcam-skin-simulation, indexeddb, recharts, vitest, vercel
+
+### Image gallery
+
+Upload these files from `docs/screenshots/` (3:2 ratio, under 5 MB each):
+
+1. `gallery-1-verdict.png`: the first screen, the verdict and the trend chart.
+2. `gallery-2-youcam.png`: the heatmap comparison, the realistic goal and the skin report.
+3. `gallery-3-flow.png`: starting a trial, the weekly check-in and the shelf.
+
+Single phone screens are in `docs/screenshots/phone/` if you want more images.
 
 ### "Try it out" links
 
@@ -121,7 +133,7 @@ For consumers, the value is fewer wasted purchases and less guesswork. People ma
 
 ### Was there a moment during the hackathon where the API surprised you, in a good or frustrating way?
 
-There were both kinds of moments. A good surprise was how much one Skin Analysis call returns: 15 concern scores, each with a raw score and a user-facing score, plus the overall score, skin age, skin type and a full-size heatmap mask for each concern, usually in 3 to 6 seconds. The masks use a white background, so we could overlay them on the user's photo with a simple CSS multiply blend. A frustrating moment came when we tried to analyze a Skin Simulation result by passing its URL directly. The task ran for about 70 seconds and then failed with `error_download_image`. Downloading the image and uploading it again through the File API solved the problem.
+There were both kinds of moments. A good surprise was how much one Skin Analysis call returns: 15 concern scores, each with a raw score and a user-facing score, plus the overall score, skin age, skin type and a full-size heatmap mask for each concern, usually in 3 to 6 seconds. The masks are transparent PNG images, so we could lay them directly over the user's photo. A frustrating moment came when we tried to analyze a Skin Simulation result by passing its URL directly. The task ran for about 70 seconds and then failed with `error_download_image`. Downloading the image and uploading it again through the File API solved the problem.
 
 ### Are there industries or use cases you think Perfect Corp.'s API could serve that nobody is talking about yet?
 
@@ -151,7 +163,7 @@ Record the app on a phone (screen recording) and add voice-over. Do not use copy
 | 0:00–0:15 | The empty shelf screen with the example verdict card. | "Most people cannot tell whether their skincare is working. Verdict answers that question using the YouCam Skin AI API." |
 | 0:15–0:35 | Start a trial: type the product name, choose Oiliness and Pores, keep today's date. | "I start a trial for a niacinamide serum and choose the two concerns it promises to improve: oiliness and pores." |
 | 0:35–0:55 | The camera screen with the oval guide and the light check, then the scan progress steps. | "The camera guides my framing and checks the light. Each check-in is a full YouCam AI Skin Analysis of 16 concerns, and the result arrives in a few seconds." |
-| 0:55–1:20 | The goal page: drag the Before and Goal slider, then show the goal scores. | "Next, YouCam AI Skin Simulation creates a realistic goal. Verdict analyzes that simulated image too, so the goal has a number: oiliness from 72 to 96." |
-| 1:20–1:50 | The sample journey trial page: the verdict card, the trend chart with the noise band and the goal line. | "After a few weekly check-ins, Verdict compares raw scores with my baseline. Changes inside the shaded band are normal scan noise. Here, oiliness improved beyond the noise, so the verdict is Working." |
-| 1:50–2:10 | Before and Now comparison with the oiliness heatmap turned on; the side-effect watch. | "I can compare my first and latest photos with the YouCam heatmap for oiliness. Verdict also watches other concerns, such as redness, and suggests a pause if they get worse." |
+| 0:55–1:20 | On the shelf, tap "View sample journey", then open its goal page: drag the Before and Goal slider and show the goal scores. | "To show a full trial, Verdict includes a simulated sample made from AI-generated photos. YouCam AI Skin Simulation creates a realistic goal, and Verdict analyzes that simulated image too, so the goal has a number: breakouts from 50 to 79." |
+| 1:20–1:50 | The sample trial page: the verdict card, the trend chart with the noise band and the goal line. | "After six weekly check-ins, Verdict compares the raw scores with the baseline. Changes inside the shaded band are normal scan noise. Here, breakouts improved by 24 points, well beyond the noise, so the verdict is Working with high confidence." |
+| 1:50–2:10 | Before and Now comparison with the breakouts heatmap turned on. | "The comparison shows the first and latest photos with the YouCam heatmap for breakouts. Verdict also watches other concerns, such as redness, and suggests a pause if they get worse." |
 | 2:10–2:30 | The skin report for one scan; the shelf with the verdict chip. | "Every scan also gives a full skin report. My photos stay on my phone. Verdict helps people keep the products that work and stop paying for the ones that do not." |

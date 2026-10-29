@@ -88,15 +88,16 @@ describe('/api/asset', () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
-  test('streams an allowlisted asset with its content type', async () => {
+  test('streams an allowlisted asset, typed by its bytes', async () => {
+    const jpegBytes = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 1, 2]);
     const spy = vi
       .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(new Response(new Uint8Array([1, 2]), { headers: { 'Content-Type': 'image/jpeg' } }));
+      .mockResolvedValue(new Response(jpegBytes, { headers: { 'Content-Type': 'binary/octet-stream' } }));
     const u = 'https://yce-us.s3-accelerate.amazonaws.com/x/mask.jpg?sig=1';
     const res = await assetGET(req(`/api/asset?u=${encodeURIComponent(u)}`));
     expect(res.status).toBe(200);
     expect(res.headers.get('Content-Type')).toBe('image/jpeg');
-    expect(new Uint8Array(await res.arrayBuffer())).toEqual(new Uint8Array([1, 2]));
+    expect(new Uint8Array(await res.arrayBuffer())).toEqual(jpegBytes);
     expect(spy).toHaveBeenCalledWith(u, { redirect: 'error' });
   });
 
@@ -129,12 +130,18 @@ describe('daily scan cap', () => {
 
 describe('/api/asset content types', () => {
   const u = encodeURIComponent('https://yce-us.s3-accelerate.amazonaws.com/x/mask.jpg');
-  test('only raster images pass, with nosniff', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('x', { headers: { 'Content-Type': 'image/png' } }));
+  test('a PNG mask labelled as octet-stream is served as image/png with nosniff', async () => {
+    const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0]);
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(png, { headers: { 'Content-Type': 'binary/octet-stream' } }));
     const ok = await assetGET(req(`/api/asset?u=${u}`));
+    expect(ok.status).toBe(200);
+    expect(ok.headers.get('Content-Type')).toBe('image/png');
     expect(ok.headers.get('X-Content-Type-Options')).toBe('nosniff');
-    for (const type of ['text/html', 'image/svg+xml', 'application/javascript']) {
-      vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('x', { headers: { 'Content-Type': type } }));
+  });
+
+  test('anything that is not JPEG, PNG or WebP bytes is refused, whatever its label', async () => {
+    for (const body of ['<html><script>alert(1)</script>', '<svg xmlns="http://www.w3.org/2000/svg"/>', 'x']) {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(body, { headers: { 'Content-Type': 'image/png' } }));
       expect((await assetGET(req(`/api/asset?u=${u}`))).status).toBe(502);
     }
   });

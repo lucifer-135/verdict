@@ -37,7 +37,8 @@ A `file_id` can be reused: the same id ran a skin-analysis task and then a skin-
 
 ## Masks
 - Host: `yce-us.s3-accelerate.amazonaws.com` (presigned). Downloadable with a plain GET; no auth header.
-- Format: full-size JPEG (same size as the resized input), **white background** with a colored heatmap. Overlay on the photo with CSS `mix-blend-mode: multiply`. There is no alpha channel.
+- Format: full-size **PNG with transparency** (same size as the resized input): a colored heatmap on a transparent background. It can be laid directly over the photo. (Corrected 2026-10-29: the spike saved these with a `.jpg` name because S3 does not label them `image/png`; `/api/asset` therefore detects the type from the bytes. Converting a mask to JPEG flattens the transparency to black.)
+- Identical input gives identical scores: re-running the same six sample photos reproduced every raw score exactly.
 
 ## Skin Simulation
 - Create: `POST /s2s/v2.0/task/skin-simulation` with a flat body. Each concern is a top-level number 0–1 (at least one > 0):

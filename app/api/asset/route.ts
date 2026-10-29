@@ -18,17 +18,28 @@ export async function GET(req: Request) {
   } catch {
     return errorResponse(502, 'asset_fetch_failed');
   }
-  // Served from our origin, so only raster images pass: no HTML, script or SVG.
-  const type = upstream.headers.get('Content-Type') ?? '';
-  if (!upstream.ok || !upstream.body || !/^image\/(jpeg|png|webp)\b/.test(type)) {
-    return errorResponse(502, 'asset_fetch_failed');
-  }
+  if (!upstream.ok) return errorResponse(502, 'asset_fetch_failed');
 
-  return new Response(upstream.body, {
+  // S3 does not label the masks reliably, so the type comes from the bytes.
+  // Served from our origin, so only raster images pass: no HTML, script or SVG.
+  const bytes = new Uint8Array(await upstream.arrayBuffer());
+  const type = rasterType(bytes);
+  if (!type) return errorResponse(502, 'asset_fetch_failed');
+
+  return new Response(bytes, {
     headers: {
       'Content-Type': type,
       'Cache-Control': 'private, max-age=3600',
       'X-Content-Type-Options': 'nosniff',
     },
   });
+}
+
+/** JPEG, PNG or WebP by magic bytes; null for anything else. */
+function rasterType(b: Uint8Array): string | null {
+  const starts = (...sig: number[]) => sig.every((v, i) => b[i] === v);
+  if (starts(0xff, 0xd8, 0xff)) return 'image/jpeg';
+  if (starts(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a)) return 'image/png';
+  if (starts(0x52, 0x49, 0x46, 0x46) && b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50) return 'image/webp';
+  return null;
 }

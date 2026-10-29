@@ -35,6 +35,7 @@ The verdict engine is a pure TypeScript function in [lib/verdict/engine.ts](lib/
 - **Realistic goal preview:** A before-and-goal comparison built with Skin Simulation.
 - **Trial detail:** The verdict with its reason and confidence, a trend chart with the noise band and the goal line, a before-and-now comparison with the concern heatmap, a side-effect watch and the list of check-ins.
 - **Skin report:** All concern scores for one scan, with a tap-to-show heatmap for each concern.
+- **Simulated sample journey:** A six-week trial made from AI-generated photos and analyzed with the real YouCam API. It is labeled as a simulated sample in the app, so it is never presented as a real user.
 - **Privacy:** Photos, scores and trials are stored only in the browser (IndexedDB). The server forwards requests to YouCam and stores nothing about the user.
 
 ## Running the project
@@ -52,6 +53,7 @@ npm run dev                  # http://localhost:3000
 | `YOUCAM_API_KEY` | Your YouCam API key. It is only used on the server. |
 | `YOUCAM_BASE_URL` | The API host. The default is `https://yce-api-01.makeupar.com`. |
 | `YOUCAM_MOCK` | Set to `1` to use recorded responses and spend no API units. |
+| `SCAN_LIMIT_PER_IP_PER_DAY` | The number of scans and simulations one visitor (IP address) may run per day. The default is 10. Each server instance counts separately, so this is a best-effort guard for a public demo link. |
 
 To try the app without an API key or units, run:
 
@@ -60,6 +62,10 @@ npm run dev:mock
 ```
 
 Mock mode returns recorded YouCam responses from `fixtures/youcam/`. A camera needs HTTPS or `localhost`; on other addresses the app offers a file picker instead.
+
+## Screenshots
+
+Gallery images (3:2) are in [docs/screenshots/](docs/screenshots/), and single phone screens are in [docs/screenshots/phone/](docs/screenshots/phone/).
 
 ## Tests and checks
 

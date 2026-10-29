@@ -1,5 +1,457 @@
 {
-  "trial": { "productName": "", "concerns": [], "startDate": "" },
-  "goal": null,
-  "scans": []
+  "trial": {
+    "productName": "Salicylic acid 2% cleanser",
+    "concerns": [
+      "acne",
+      "redness"
+    ],
+    "startDate": "2026-09-14"
+  },
+  "goal": {
+    "image": "/sample/goal.jpg",
+    "scores": {
+      "acne": 78.83160000000001,
+      "redness": 100
+    }
+  },
+  "scans": [
+    {
+      "takenAt": "2026-09-14T06:30:00.000Z",
+      "photo": "/sample/photos/1.jpg",
+      "overall": 74.86666666666666,
+      "skinAge": 24,
+      "skinType": "Oily",
+      "scores": {
+        "eye_bag": {
+          "raw": 75.76366662979126,
+          "ui": 79
+        },
+        "tear_trough": {
+          "raw": 53.0860960483551,
+          "ui": 69
+        },
+        "pore": {
+          "raw": 59.85336971282959,
+          "ui": 72
+        },
+        "firmness": {
+          "raw": 73.97593855857849,
+          "ui": 78
+        },
+        "oiliness": {
+          "raw": 69.52600860595703,
+          "ui": 76
+        },
+        "redness": {
+          "raw": 73.57486724853516,
+          "ui": 78
+        },
+        "droopy_lower_eyelid": {
+          "raw": 68.71675252914429,
+          "ui": 76
+        },
+        "droopy_upper_eyelid": {
+          "raw": 81.29509687423706,
+          "ui": 81
+        },
+        "dark_circle_v2": {
+          "raw": 57.79876708984375,
+          "ui": 68
+        },
+        "radiance": {
+          "raw": 60.390883684158325,
+          "ui": 72
+        },
+        "age_spot": {
+          "raw": 86.98375701904297,
+          "ui": 78
+        },
+        "texture": {
+          "raw": 71.49578332901001,
+          "ui": 77
+        },
+        "wrinkle": {
+          "raw": 91.89295172691345,
+          "ui": 84
+        },
+        "acne": {
+          "raw": 49.68823999999999,
+          "ui": 67
+        },
+        "moisture": {
+          "raw": 44.76624131202698,
+          "ui": 68
+        }
+      },
+      "masks": {
+        "acne": "/sample/masks/1-acne.png",
+        "redness": "/sample/masks/1-redness.png"
+      }
+    },
+    {
+      "takenAt": "2026-09-21T06:30:00.000Z",
+      "photo": "/sample/photos/2.jpg",
+      "overall": 76,
+      "skinAge": 25,
+      "skinType": "Dry",
+      "scores": {
+        "eye_bag": {
+          "raw": 73.45030307769775,
+          "ui": 78
+        },
+        "tear_trough": {
+          "raw": 53.94790768623352,
+          "ui": 69
+        },
+        "droopy_lower_eyelid": {
+          "raw": 69.99362707138062,
+          "ui": 76
+        },
+        "droopy_upper_eyelid": {
+          "raw": 82.02842473983765,
+          "ui": 82
+        },
+        "redness": {
+          "raw": 83.05305480957031,
+          "ui": 82
+        },
+        "oiliness": {
+          "raw": 77.280517578125,
+          "ui": 79
+        },
+        "pore": {
+          "raw": 60.35348916053772,
+          "ui": 72
+        },
+        "firmness": {
+          "raw": 73.40749502182007,
+          "ui": 78
+        },
+        "texture": {
+          "raw": 75.01716613769531,
+          "ui": 78
+        },
+        "age_spot": {
+          "raw": 86.6702651977539,
+          "ui": 78
+        },
+        "dark_circle_v2": {
+          "raw": 59.48692262172699,
+          "ui": 69
+        },
+        "radiance": {
+          "raw": 60.92113256454468,
+          "ui": 72
+        },
+        "wrinkle": {
+          "raw": 91.99046492576599,
+          "ui": 84
+        },
+        "acne": {
+          "raw": 65.1822,
+          "ui": 74
+        },
+        "moisture": {
+          "raw": 48.03109169006348,
+          "ui": 69
+        }
+      },
+      "masks": {
+        "acne": "/sample/masks/2-acne.png",
+        "redness": "/sample/masks/2-redness.png"
+      }
+    },
+    {
+      "takenAt": "2026-09-28T06:30:00.000Z",
+      "photo": "/sample/photos/3.jpg",
+      "overall": 76.4,
+      "skinAge": 22,
+      "skinType": "Oily",
+      "scores": {
+        "tear_trough": {
+          "raw": 53.53592336177826,
+          "ui": 69
+        },
+        "redness": {
+          "raw": 91.58817291259766,
+          "ui": 87
+        },
+        "firmness": {
+          "raw": 76.42743587493896,
+          "ui": 79
+        },
+        "eye_bag": {
+          "raw": 72.88932204246521,
+          "ui": 78
+        },
+        "droopy_lower_eyelid": {
+          "raw": 70.19250988960266,
+          "ui": 76
+        },
+        "age_spot": {
+          "raw": 87.52215576171875,
+          "ui": 79
+        },
+        "texture": {
+          "raw": 75.26445984840393,
+          "ui": 79
+        },
+        "pore": {
+          "raw": 54.9136278629303,
+          "ui": 70
+        },
+        "droopy_upper_eyelid": {
+          "raw": 81.54352903366089,
+          "ui": 81
+        },
+        "oiliness": {
+          "raw": 73.49440002441406,
+          "ui": 78
+        },
+        "dark_circle_v2": {
+          "raw": 57.62653350830078,
+          "ui": 68
+        },
+        "wrinkle": {
+          "raw": 92.81434416770935,
+          "ui": 85
+        },
+        "radiance": {
+          "raw": 65.47893285751343,
+          "ui": 74
+        },
+        "acne": {
+          "raw": 65.83372,
+          "ui": 74
+        },
+        "moisture": {
+          "raw": 48.281413316726685,
+          "ui": 69
+        }
+      },
+      "masks": {
+        "acne": "/sample/masks/3-acne.png",
+        "redness": "/sample/masks/3-redness.png"
+      }
+    },
+    {
+      "takenAt": "2026-10-05T06:30:00.000Z",
+      "photo": "/sample/photos/4.jpg",
+      "overall": 75.66666666666667,
+      "skinAge": 25,
+      "skinType": "Oily",
+      "scores": {
+        "tear_trough": {
+          "raw": 52.09318995475769,
+          "ui": 68
+        },
+        "droopy_lower_eyelid": {
+          "raw": 69.77736949920654,
+          "ui": 76
+        },
+        "droopy_upper_eyelid": {
+          "raw": 80.86351156234741,
+          "ui": 81
+        },
+        "eye_bag": {
+          "raw": 73.63170385360718,
+          "ui": 78
+        },
+        "redness": {
+          "raw": 87.24948120117188,
+          "ui": 84
+        },
+        "pore": {
+          "raw": 53.80703508853912,
+          "ui": 69
+        },
+        "radiance": {
+          "raw": 62.625694274902344,
+          "ui": 73
+        },
+        "firmness": {
+          "raw": 73.28640222549438,
+          "ui": 78
+        },
+        "wrinkle": {
+          "raw": 92.4303412437439,
+          "ui": 85
+        },
+        "dark_circle_v2": {
+          "raw": 58.87516438961029,
+          "ui": 68
+        },
+        "oiliness": {
+          "raw": 71.78985595703125,
+          "ui": 77
+        },
+        "acne": {
+          "raw": 60.794619999999995,
+          "ui": 72
+        },
+        "moisture": {
+          "raw": 47.986289858818054,
+          "ui": 69
+        },
+        "texture": {
+          "raw": 73.79432916641235,
+          "ui": 78
+        },
+        "age_spot": {
+          "raw": 87.89347839355469,
+          "ui": 79
+        }
+      },
+      "masks": {
+        "acne": "/sample/masks/4-acne.png",
+        "redness": "/sample/masks/4-redness.png"
+      }
+    },
+    {
+      "takenAt": "2026-10-12T06:30:00.000Z",
+      "photo": "/sample/photos/5.jpg",
+      "overall": 76.6,
+      "skinAge": 25,
+      "skinType": "Oily",
+      "scores": {
+        "eye_bag": {
+          "raw": 77.25085020065308,
+          "ui": 79
+        },
+        "tear_trough": {
+          "raw": 54.33117151260376,
+          "ui": 69
+        },
+        "droopy_lower_eyelid": {
+          "raw": 67.25395917892456,
+          "ui": 75
+        },
+        "droopy_upper_eyelid": {
+          "raw": 81.62832260131836,
+          "ui": 81
+        },
+        "redness": {
+          "raw": 92.8475341796875,
+          "ui": 89
+        },
+        "firmness": {
+          "raw": 76.67015194892883,
+          "ui": 79
+        },
+        "age_spot": {
+          "raw": 87.54705047607422,
+          "ui": 79
+        },
+        "oiliness": {
+          "raw": 71.12723541259766,
+          "ui": 77
+        },
+        "texture": {
+          "raw": 75.08118152618408,
+          "ui": 78
+        },
+        "radiance": {
+          "raw": 70.92800736427307,
+          "ui": 77
+        },
+        "wrinkle": {
+          "raw": 91.54844880104065,
+          "ui": 83
+        },
+        "dark_circle_v2": {
+          "raw": 58.441558480262756,
+          "ui": 68
+        },
+        "pore": {
+          "raw": 52.07707941532135,
+          "ui": 68
+        },
+        "acne": {
+          "raw": 70.76084,
+          "ui": 77
+        },
+        "moisture": {
+          "raw": 49.35203492641449,
+          "ui": 70
+        }
+      },
+      "masks": {
+        "acne": "/sample/masks/5-acne.png",
+        "redness": "/sample/masks/5-redness.png"
+      }
+    },
+    {
+      "takenAt": "2026-10-26T06:30:00.000Z",
+      "photo": "/sample/photos/6.jpg",
+      "overall": 78.06666666666666,
+      "skinAge": 25,
+      "skinType": "Dry",
+      "scores": {
+        "tear_trough": {
+          "raw": 54.03924286365509,
+          "ui": 69
+        },
+        "eye_bag": {
+          "raw": 74.74986910820007,
+          "ui": 78
+        },
+        "redness": {
+          "raw": 95.93595123291016,
+          "ui": 93
+        },
+        "pore": {
+          "raw": 63.11653399467468,
+          "ui": 73
+        },
+        "droopy_lower_eyelid": {
+          "raw": 69.76521015167236,
+          "ui": 76
+        },
+        "droopy_upper_eyelid": {
+          "raw": 81.641286611557,
+          "ui": 81
+        },
+        "firmness": {
+          "raw": 77.3088812828064,
+          "ui": 79
+        },
+        "radiance": {
+          "raw": 72.82899022102356,
+          "ui": 77
+        },
+        "texture": {
+          "raw": 77.14475393295288,
+          "ui": 79
+        },
+        "oiliness": {
+          "raw": 78.4454116821289,
+          "ui": 80
+        },
+        "age_spot": {
+          "raw": 91.02392578125,
+          "ui": 82
+        },
+        "wrinkle": {
+          "raw": 92.71571040153503,
+          "ui": 85
+        },
+        "dark_circle_v2": {
+          "raw": 62.21243441104889,
+          "ui": 70
+        },
+        "acne": {
+          "raw": 77.13573,
+          "ui": 79
+        },
+        "moisture": {
+          "raw": 49.268126487731934,
+          "ui": 70
+        }
+      },
+      "masks": {
+        "acne": "/sample/masks/6-acne.png",
+        "redness": "/sample/masks/6-redness.png"
+      }
+    }
+  ]
 }

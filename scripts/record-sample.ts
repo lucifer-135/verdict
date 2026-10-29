@@ -74,6 +74,13 @@ async function takenAt(file: string, bytes: Buffer): Promise<string> {
 
 const forUpload = (bytes: Buffer) =>
   sharp(bytes).rotate().resize(2560, 2560, { fit: 'inside', withoutEnlargement: true }).jpeg({ quality: 90 }).toBuffer();
+/** Masks are transparent PNGs; JPEG would flatten the transparency to black. */
+const saveMask = (bytes: Buffer, path: string) =>
+  sharp(bytes)
+    .resize(PUBLIC_LONG_SIDE, PUBLIC_LONG_SIDE, { fit: 'inside', withoutEnlargement: true })
+    .png({ compressionLevel: 9 })
+    .toFile(join(OUT, path))
+    .then(() => `/sample/${path}`);
 const savePublic = (bytes: Buffer, path: string) =>
   sharp(bytes)
     .rotate()
@@ -110,7 +117,7 @@ async function main() {
       const url = result.maskUrls[c];
       if (!url) continue;
       const mask = Buffer.from(await (await fetch(url)).arrayBuffer());
-      masks[c] = await savePublic(mask, `masks/${i + 1}-${c}.jpg`);
+      masks[c] = await saveMask(mask, `masks/${i + 1}-${c}.png`);
     }
     scans.push({
       takenAt: p.takenAt,
