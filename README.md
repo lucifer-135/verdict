@@ -35,8 +35,11 @@ The verdict engine is a pure TypeScript function in [lib/verdict/engine.ts](lib/
 
 ## Features
 
-- **Trial setup:** The user names the product, chooses up to three concerns and sets the start date, which can be in the past.
-- **Camera check-in:** The front camera shows an oval guide and checks the light before capture. If the camera is not available, the user can choose a photo instead.
+- **Trial setup:** The user names the product, chooses up to three concerns and sets the start date, which can be in the past. The price is optional.
+- **Camera check-in:** The front camera shows an oval guide and checks the light before capture. The previous photo is shown faintly over the camera, so each check-in uses the same framing. If the camera is not available, the user can choose a photo instead.
+- **Price and money saved:** With a price and how long one bottle lasts, the trial shows the monthly cost in US dollars. When the verdict is Not moving or Pause, it shows how much stopping would save each month.
+- **Share the verdict:** A Share button turns the verdict into an image (without any face photo) and opens the phone's share menu, or downloads the image on a computer.
+- **Install as an app:** Verdict can be added to the home screen and opens full screen. Saved trials, reports and the sample journey open offline; scanning needs a connection, and the app says so.
 - **Import of past selfies:** Photos are dated from their EXIF data or by the user. Photos that were already imported are skipped before any API call, so no units are wasted.
 - **Realistic goal preview:** A before-and-goal comparison built with Skin Simulation.
 - **Trial detail:** The verdict with its reason and confidence, a trend chart with the noise band and the goal line, a before-and-now comparison with the concern heatmap, a side-effect watch and the list of check-ins.
