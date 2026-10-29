@@ -54,3 +54,6 @@ CLAUDE.md
 /*.jpeg
 /*.png
 /*.heic
+
+# session handoff notes (kept out of the repository)
+HANDOFF.md
