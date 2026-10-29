@@ -25,6 +25,14 @@ export interface TrialGoal {
   scores: Partial<Record<ConcernId, number>>;
 }
 
+/** What the product costs, used to show the monthly cost and the money a stop would save. */
+export interface TrialCost {
+  /** US dollars for one bottle or tube. */
+  price: number;
+  /** How many weeks one bottle lasts. */
+  weeksPerUnit: number;
+}
+
 export interface Trial {
   id: string;
   productName: string;
@@ -35,6 +43,8 @@ export interface Trial {
   createdAt: string;
   isSample: boolean;
   archived: boolean;
+  /** Optional: trials created before prices existed have none. */
+  cost?: TrialCost;
 }
 
 export type VerdictKind = 'too_early' | 'working' | 'give_it_time' | 'not_moving' | 'pause';

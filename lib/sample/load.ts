@@ -1,11 +1,11 @@
 import bundled from './journey.json';
 import { listTrials, putBlob, saveScan, saveTrial } from '@/lib/store/db';
 import type { ConcernId } from '@/lib/verdict/concerns';
-import type { ConcernScore, Scan, Trial } from '@/lib/verdict/types';
+import type { ConcernScore, Scan, Trial, TrialCost } from '@/lib/verdict/types';
 
 /** Recorded by scripts/record-sample.ts from real API responses on consented, dated selfies. */
 export interface SampleJourney {
-  trial: { productName: string; concerns: ConcernId[]; startDate: string };
+  trial: { productName: string; concerns: ConcernId[]; startDate: string; cost?: TrialCost };
   goal: { image: string; scores: Partial<Record<ConcernId, number>> } | null;
   scans: {
     takenAt: string;

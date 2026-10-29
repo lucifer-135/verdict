@@ -4,7 +4,10 @@ import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { ArrowRight, Camera, Check, Images } from '@phosphor-icons/react';
+import { DEFAULT_WEEKS_PER_UNIT } from '@/components/CostEditor';
+import { CostInputs } from '@/components/CostInputs';
 import { Button, PageHeader } from '@/components/ui';
+import { parseCost } from '@/lib/trials/cost';
 import { saveTrial } from '@/lib/store/db';
 import { TARGETABLE, type ConcernId } from '@/lib/verdict/concerns';
 import type { Trial } from '@/lib/verdict/types';
@@ -19,9 +22,12 @@ function DetailsStep({ onSaved }: { onSaved: (t: Trial) => void }) {
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
+  const [price, setPrice] = useState('');
+  const [weeks, setWeeks] = useState(DEFAULT_WEEKS_PER_UNIT);
 
   const nameError = !name.trim() ? 'Name the product you are testing.' : null;
   const concernError = concerns.length === 0 ? 'Pick at least one thing it should improve.' : null;
+  const parsedCost = parseCost(price, weeks);
 
   const toggle = (id: ConcernId) =>
     setConcerns(cs => (cs.includes(id) ? cs.filter(c => c !== id) : cs.length < MAX_CONCERNS ? [...cs, id] : cs));
@@ -32,6 +38,7 @@ function DetailsStep({ onSaved }: { onSaved: (t: Trial) => void }) {
     if (nameError) return document.getElementById('product')?.focus();
     if (concernError) return document.querySelector<HTMLButtonElement>('[aria-pressed]')?.focus();
     if (!startDate) return document.getElementById('start')?.focus();
+    if (parsedCost.error) return;
     setSaving(true);
     const trial: Trial = {
       id: crypto.randomUUID(),
@@ -42,6 +49,7 @@ function DetailsStep({ onSaved }: { onSaved: (t: Trial) => void }) {
       createdAt: new Date().toISOString(),
       isSample: false,
       archived: false,
+      ...(parsedCost.cost ? { cost: parsedCost.cost } : {}),
     };
     try {
       await saveTrial(trial);
@@ -118,6 +126,14 @@ function DetailsStep({ onSaved }: { onSaved: (t: Trial) => void }) {
           Already using it? Pick the day you began.
         </p>
       </div>
+
+      <CostInputs
+        price={price}
+        weeks={weeks}
+        onPrice={setPrice}
+        onWeeks={setWeeks}
+        error={submitted ? parsedCost.error : null}
+      />
 
       {saveError && (
         <p role="alert" className="text-sm text-rose-700">

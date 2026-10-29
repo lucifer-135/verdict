@@ -10,6 +10,7 @@ import { Disclaimer } from '@/components/Disclaimer';
 import { SampleBadge } from '@/components/SampleBadge';
 import { TrendChart } from '@/components/TrendChart';
 import { ConfirmButton } from '@/components/ConfirmButton';
+import { CostEditor } from '@/components/CostEditor';
 import { ButtonLink, Card, PageHeader } from '@/components/ui';
 import { saveTrial } from '@/lib/store/db';
 import { VerdictCard } from '@/components/VerdictCard';
@@ -34,7 +35,7 @@ function Section({ title, children, hint }: { title: string; hint?: string; chil
 
 export default function TrialPage() {
   const { id } = useParams<{ id: string }>();
-  const { data } = useTrialData(id);
+  const { data, reload } = useTrialData(id);
   const router = useRouter();
   const [picked, setPicked] = useState<ConcernId | null>(null);
   const [pair, setPair] = useState<Pair>('before-now');
@@ -94,6 +95,17 @@ export default function TrialPage() {
       )}
 
       <VerdictCard verdict={verdict} />
+      {(!trial.isSample || trial.cost) && (
+        <CostEditor
+          cost={trial.cost ?? null}
+          verdict={verdict.kind}
+          readOnly={trial.isSample}
+          onSave={async cost => {
+            await saveTrial({ ...trial, cost: cost ?? undefined });
+            await reload();
+          }}
+        />
+      )}
 
       {!trial.isSample && (
         <ButtonLink href={`/scan?trial=${trial.id}&then=detail`} className="mt-4 w-full">

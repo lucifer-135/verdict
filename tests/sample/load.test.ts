@@ -4,7 +4,7 @@ import { hasSampleJourney, loadSampleJourney, type SampleJourney } from '@/lib/s
 import { getBlob, getTrial, listScans, listTrials } from '@/lib/store/db';
 
 const journey: SampleJourney = {
-  trial: { productName: 'Niacinamide serum', concerns: ['oiliness'], startDate: '2026-08-01' },
+  trial: { productName: 'Niacinamide serum', concerns: ['oiliness'], startDate: '2026-08-01', cost: { price: 12, weeksPerUnit: 6 } },
   goal: { image: '/sample/goal.jpg', scores: { oiliness: 90 } },
   scans: [
     {
@@ -44,7 +44,13 @@ afterEach(() => vi.unstubAllGlobals());
 test('loadSampleJourney saves sample trial and scans', async () => {
   const id = await loadSampleJourney(journey);
   const trial = await getTrial(id);
-  expect(trial).toMatchObject({ isSample: true, productName: 'Niacinamide serum', concerns: ['oiliness'], startDate: '2026-08-01' });
+  expect(trial).toMatchObject({
+    isSample: true,
+    productName: 'Niacinamide serum',
+    concerns: ['oiliness'],
+    startDate: '2026-08-01',
+    cost: { price: 12, weeksPerUnit: 6 },
+  });
   expect(trial!.goal!.scores).toEqual({ oiliness: 90 });
   expect((await getBlob(trial!.goal!.imageBlobId))?.size).toBe(3);
 

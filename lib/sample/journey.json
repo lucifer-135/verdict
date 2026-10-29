@@ -5,7 +5,11 @@
       "acne",
       "redness"
     ],
-    "startDate": "2026-09-14"
+    "startDate": "2026-09-14",
+    "cost": {
+      "price": 14,
+      "weeksPerUnit": 6
+    }
   },
   "goal": {
     "image": "/sample/goal.jpg",
