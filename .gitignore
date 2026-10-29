@@ -57,3 +57,6 @@ CLAUDE.md
 
 # session handoff notes (kept out of the repository)
 HANDOFF.md
+
+# Claude Code local config
+.claude/
