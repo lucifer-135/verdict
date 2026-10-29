@@ -6,6 +6,10 @@ Verdict is a mobile-first web app built for the YouCam API Skin AI & eCommerce V
 
 > Verdict provides cosmetic insight. It is not medical advice.
 
+![Verdict compares repeated YouCam skin scans and says whether a product is working](docs/screenshots/gallery-1-verdict.png)
+
+> The sample journey in these screenshots uses AI-generated photos to show how a trial works. It does not show a real user.
+
 ## How it uses the YouCam API
 
 | YouCam API | How Verdict uses it |
@@ -34,7 +38,9 @@ The verdict engine is a pure TypeScript function in [lib/verdict/engine.ts](lib/
 - **Import of past selfies:** Photos are dated from their EXIF data or by the user. Photos that were already imported are skipped before any API call, so no units are wasted.
 - **Realistic goal preview:** A before-and-goal comparison built with Skin Simulation.
 - **Trial detail:** The verdict with its reason and confidence, a trend chart with the noise band and the goal line, a before-and-now comparison with the concern heatmap, a side-effect watch and the list of check-ins.
-- **Skin report:** All concern scores for one scan, with a tap-to-show heatmap for each concern.
+- **Skin report:** All concern scores for one scan. Tapping the eye on a row shows that concern's heatmap; the eye shows a slash while the map is visible.
+- **Managing data:** The user can delete a scan, archive a trial, or reset all data from the shelf. Each action asks for confirmation inside the page.
+- **Unit protection:** Retried requests never create a second paid task, duplicate photos are refused before upload, and each visitor has a daily scan limit.
 - **Simulated sample journey:** A six-week trial made from AI-generated photos and analyzed with the real YouCam API. It is labeled as a simulated sample in the app, so it is never presented as a real user.
 - **Privacy:** Photos, scores and trials are stored only in the browser (IndexedDB). The server forwards requests to YouCam and stores nothing about the user.
 
@@ -63,9 +69,23 @@ npm run dev:mock
 
 Mock mode returns recorded YouCam responses from `fixtures/youcam/`. A camera needs HTTPS or `localhost`; on other addresses the app offers a file picker instead.
 
+## Deploying
+
+The app is designed for [Vercel](https://vercel.com). Import this repository, set `YOUCAM_API_KEY` and `YOUCAM_BASE_URL` (and optionally `SCAN_LIMIT_PER_IP_PER_DAY`), and deploy. The phone camera needs HTTPS, which Vercel provides. Photos are reduced to 4 MB or less before upload, which keeps requests under Vercel's 4.5 MB body limit.
+
 ## Screenshots
 
-Gallery images (3:2) are in [docs/screenshots/](docs/screenshots/), and single phone screens are in [docs/screenshots/phone/](docs/screenshots/phone/).
+| Start | Verdict | Trend |
+|---|---|---|
+| <img src="docs/screenshots/phone/01-empty-shelf.png" width="240" alt="Start screen with an example verdict"> | <img src="docs/screenshots/phone/02-trial-verdict.png" width="240" alt="Trial page with a Working verdict"> | <img src="docs/screenshots/phone/03-trend.png" width="240" alt="Trend chart with noise band and goal line"> |
+| **Heatmap comparison** | **Realistic goal** | **Skin report** |
+| <img src="docs/screenshots/phone/04-compare-heatmap.png" width="240" alt="Before and now comparison with the breakouts heatmap"> | <img src="docs/screenshots/phone/05-goal.png" width="240" alt="Before and simulated goal comparison"> | <img src="docs/screenshots/phone/06-skin-report.png" width="240" alt="Skin report with concern scores"> |
+| **Shelf** | **New trial** | **Check-in** |
+| <img src="docs/screenshots/phone/07-shelf.png" width="240" alt="Shelf with active trials"> | <img src="docs/screenshots/phone/08-new-trial.png" width="240" alt="New trial form"> | <img src="docs/screenshots/phone/09-check-in.png" width="240" alt="Weekly check-in screen"> |
+
+Gallery images in a 3:2 ratio are in [docs/screenshots/](docs/screenshots/):
+
+![YouCam Skin Analysis heatmaps and a realistic goal built with YouCam Skin Simulation](docs/screenshots/gallery-2-youcam.png)
 
 ## Tests and checks
 
@@ -98,9 +118,11 @@ docs/                Design spec, implementation plan, API notes, submission dra
 
 ## Limitations
 
+- The phone camera has not yet been tested on a real device.
 - The noise band and the fair-verdict windows are reasoned defaults. They have not yet been validated with real users over several weeks.
 - Lighting differences between check-ins can move scores. The app asks for the same light each time and blocks capture when the frame is too dark.
-- Data stays in one browser. Clearing site data removes the history.
+- Data stays in one browser. Clearing site data, or "Reset all data" on the shelf, removes the history.
+- The daily scan limit is kept in server memory, so each Vercel instance counts separately.
 
 ## License
 
