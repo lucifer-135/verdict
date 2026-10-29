@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
-import { Camera, UploadSimple } from '@phosphor-icons/react';
+import { Camera, Ghost, UploadSimple } from '@phosphor-icons/react';
 import { captureCrop } from '@/lib/image/crop';
 import { BRIGHTNESS_MIN, meanLuminance } from '@/lib/image/prep';
 import { createGate } from '@/lib/scan/gate';
@@ -32,11 +32,19 @@ function FilePicker({ onCapture, variant }: { onCapture: OnCapture; variant: 'pr
 }
 
 /** Front-camera capture with an oval guide and a live light check; falls back to a file picker. */
-export function CameraCapture({ onCapture }: { onCapture: OnCapture }) {
+export function CameraCapture({
+  onCapture,
+  guidePhotoUrl = null,
+}: {
+  onCapture: OnCapture;
+  /** The previous scan photo, shown faintly over the camera so each check-in uses the same framing. */
+  guidePhotoUrl?: string | null;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [mode, setMode] = useState<Mode>('starting');
   const [tooDark, setTooDark] = useState(false);
   const [capturing, setCapturing] = useState(false);
+  const [showGuide, setShowGuide] = useState(true);
   const gate = useRef(createGate());
 
   useEffect(() => {
@@ -128,6 +136,16 @@ export function CameraCapture({ onCapture }: { onCapture: OnCapture }) {
     <div>
       <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-ink shadow-lift">
         <video ref={videoRef} playsInline muted className="h-full w-full -scale-x-100 object-cover" />
+        {guidePhotoUrl && showGuide && (
+          // Mirrored like the live preview, so the old photo lines up with what the user sees.
+          // eslint-disable-next-line @next/next/no-img-element -- local object URL
+          <img
+            data-guide
+            src={guidePhotoUrl}
+            alt=""
+            className="pointer-events-none absolute inset-0 h-full w-full -scale-x-100 object-cover opacity-35"
+          />
+        )}
         <svg viewBox="0 0 300 400" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden>
           <defs>
             <mask id="oval-cut">
@@ -167,6 +185,19 @@ export function CameraCapture({ onCapture }: { onCapture: OnCapture }) {
           </button>
         </div>
       </div>
+      {guidePhotoUrl && mode === 'live' && (
+        <button
+          type="button"
+          aria-pressed={showGuide}
+          onClick={() => setShowGuide(v => !v)}
+          className={`mt-3 inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-colors duration-150 ${
+            showGuide ? 'bg-primary-soft text-primary' : 'bg-surface text-ink-muted ring-1 ring-inset ring-line'
+          }`}
+        >
+          <Ghost aria-hidden size={18} weight="bold" />
+          Line up with last photo
+        </button>
+      )}
       <div className="mt-3">
         <FilePicker onCapture={onCapture} variant="ghost" />
       </div>

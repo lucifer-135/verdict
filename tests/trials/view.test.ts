@@ -1,4 +1,4 @@
-import { activeTrials, baselineScan, evaluationDate, nextCheckIn, scansForTrial } from '@/lib/trials/view';
+import { activeTrials, baselineScan, evaluationDate, latestRealScan, nextCheckIn, scansForTrial } from '@/lib/trials/view';
 import type { Scan, ScanSource, Trial } from '@/lib/verdict/types';
 
 const scan = (source: ScanSource, takenAt = '2026-09-01T09:00:00.000Z'): Scan => ({
@@ -72,4 +72,12 @@ describe('final-review fixes', () => {
     expect(evaluationDate(trial(), [camera], now)).toBe(now);
     expect(evaluationDate(trial({ isSample: true }), [], now)).toBe(now);
   });
+});
+
+test('latestRealScan is the newest camera or imported scan, never the sample', () => {
+  const older = scan('camera', '2026-09-01T09:00:00.000Z');
+  const newer = scan('import', '2026-09-20T09:00:00.000Z');
+  const sampleNewest = scan('sample', '2026-10-26T09:00:00.000Z');
+  expect(latestRealScan([newer, sampleNewest, older])).toBe(newer);
+  expect(latestRealScan([sampleNewest])).toBeNull();
 });

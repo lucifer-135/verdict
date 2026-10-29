@@ -45,3 +45,8 @@ export function evaluationDate(trial: Trial, scans: Scan[], now: Date): Date {
   if (!trial.isSample || scans.length === 0) return now;
   return new Date(scans.reduce((a, b) => (a.takenAt > b.takenAt ? a : b)).takenAt);
 }
+
+/** The newest real (camera or imported) scan: the photo the camera guide lines up against. */
+export function latestRealScan(scans: Scan[]): Scan | null {
+  return scans.filter(s => s.source !== 'sample').reduce<Scan | null>((a, b) => (!a || b.takenAt > a.takenAt ? b : a), null);
+}

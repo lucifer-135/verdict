@@ -9,7 +9,9 @@ import { createGate } from '@/lib/scan/gate';
 import { ScanError } from '@/lib/scan/poll';
 import { checkPickedPhoto } from '@/lib/scan/pickedPhoto';
 import { resumeScan, runScan, type ScanOptions, type ScanStatus } from '@/lib/scan/runScan';
-import { getTrial } from '@/lib/store/db';
+import { getTrial, listScans } from '@/lib/store/db';
+import { useBlobUrl } from '@/lib/store/useBlobUrl';
+import { latestRealScan } from '@/lib/trials/view';
 import type { Trial } from '@/lib/verdict/types';
 
 const STEPS: { status: ScanStatus; label: string }[] = [
@@ -68,6 +70,15 @@ function ScanFlow() {
     if (trialId) getTrial(trialId).then(t => setTrial(t ?? null), () => setTrial(null));
   }, [trialId]);
 
+  const [guidePhotoId, setGuidePhotoId] = useState<string | null>(null);
+  useEffect(() => {
+    listScans().then(
+      scans => setGuidePhotoId(latestRealScan(scans)?.photoBlobId ?? null),
+      () => setGuidePhotoId(null),
+    );
+  }, []);
+  const guidePhotoUrl = useBlobUrl(guidePhotoId);
+
   function capture(file: Blob, from: PhotoSource) {
     return gate.current.run(async () => {
       let origin: PhotoInfo = { source: 'camera' };
@@ -121,7 +132,7 @@ function ScanFlow() {
               </li>
             ))}
           </ul>
-          <CameraCapture onCapture={capture} />
+          <CameraCapture onCapture={capture} guidePhotoUrl={guidePhotoUrl} />
         </>
       )}
 
