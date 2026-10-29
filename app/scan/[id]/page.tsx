@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { Disclaimer } from '@/components/Disclaimer';
 import { ScoreList } from '@/components/ScoreList';
-import { Button, ButtonLink, Card, PageHeader } from '@/components/ui';
+import { ConfirmButton } from '@/components/ConfirmButton';
+import { ButtonLink, Card, PageHeader } from '@/components/ui';
 import { deleteScan, getScan } from '@/lib/store/db';
 import { useBlobUrl } from '@/lib/store/useBlobUrl';
 import { getConcern, type ConcernId } from '@/lib/verdict/concerns';
@@ -98,17 +99,18 @@ export default function ScanReportPage() {
       </Card>
 
       {scan.source !== 'sample' && (
-        <Button
-          variant="ghost"
-          className="mt-6 w-full text-rose-700 hover:bg-rose-50"
-          onClick={async () => {
-            if (!window.confirm('Delete this scan? It will be removed from every trial. This cannot be undone.')) return;
-            await deleteScan(scan.id);
-            router.push('/');
-          }}
-        >
-          Delete this scan
-        </Button>
+        <div className="mt-6">
+          <ConfirmButton
+            label="Delete this scan"
+            question="Delete this scan? It will be removed from every trial. This cannot be undone."
+            confirmLabel="Delete"
+            className="text-rose-700 hover:bg-rose-50"
+            onConfirm={async () => {
+              await deleteScan(scan.id);
+              router.push('/');
+            }}
+          />
+        </div>
       )}
 
       <ButtonLink href="/" variant="secondary" className="mt-3 w-full">

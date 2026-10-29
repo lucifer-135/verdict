@@ -1,4 +1,4 @@
-import { Eye } from '@phosphor-icons/react/dist/ssr';
+import { Eye, EyeSlash } from '@phosphor-icons/react/dist/ssr';
 import { getConcern, type ConcernId } from '@/lib/verdict/concerns';
 import type { ConcernScore } from '@/lib/verdict/types';
 
@@ -42,7 +42,12 @@ export function ScoreList({
                 }`}
               >
                 {body}
-                <Eye aria-hidden size={16} className={selected === concern ? 'text-primary' : 'text-ink-muted'} />
+                {selected === concern ? (
+                  <EyeSlash aria-hidden data-icon="eye-slash" size={16} className="text-primary" />
+                ) : (
+                  <Eye aria-hidden data-icon="eye" size={16} className="text-ink-muted" />
+                )}
+                <span className="sr-only">{selected === concern ? 'Hide map' : 'Show map'}</span>
               </button>
             ) : (
               <div className="flex min-h-12 items-center gap-3 px-2">

@@ -26,3 +26,15 @@ test('ScoreList rows with a mask are toggle buttons', () => {
   expect(onSelect).toHaveBeenCalledWith('oiliness');
   expect(screen.queryByRole('button', { name: /Pores/ })).toBeNull();
 });
+
+test('the eye button says hide (eye with slash) when its map is shown, show otherwise', () => {
+  render(
+    <ScoreList scores={scores} withMask={new Set(['oiliness', 'pore'])} selected="oiliness" onSelect={vi.fn()} />,
+  );
+  const on = screen.getByRole('button', { name: /Oiliness/ });
+  const off = screen.getByRole('button', { name: /Pores/ });
+  expect(on).toHaveAccessibleName(/Hide map/);
+  expect(on.querySelector('[data-icon="eye-slash"]')).not.toBeNull();
+  expect(off).toHaveAccessibleName(/Show map/);
+  expect(off.querySelector('[data-icon="eye"]')).not.toBeNull();
+});

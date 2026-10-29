@@ -9,7 +9,8 @@ import { CompareSlider } from '@/components/CompareSlider';
 import { Disclaimer } from '@/components/Disclaimer';
 import { SampleBadge } from '@/components/SampleBadge';
 import { TrendChart } from '@/components/TrendChart';
-import { Button, ButtonLink, Card, PageHeader } from '@/components/ui';
+import { ConfirmButton } from '@/components/ConfirmButton';
+import { ButtonLink, Card, PageHeader } from '@/components/ui';
 import { saveTrial } from '@/lib/store/db';
 import { VerdictCard } from '@/components/VerdictCard';
 import { useBlobUrl } from '@/lib/store/useBlobUrl';
@@ -222,17 +223,17 @@ export default function TrialPage() {
       </Section>
 
       {!trial.isSample && (
-        <Button
-          variant="ghost"
-          className="mt-6 w-full"
-          onClick={async () => {
-            if (!window.confirm(`Archive ${trial.productName}? It will leave your shelf. Its scans stay in your history.`)) return;
-            await saveTrial({ ...trial, archived: true });
-            router.push('/');
-          }}
-        >
-          Archive this trial
-        </Button>
+        <div className="mt-6">
+          <ConfirmButton
+            label="Archive this trial"
+            question={`Archive ${trial.productName}? It will leave your shelf. Its scans stay in your history.`}
+            confirmLabel="Archive"
+            onConfirm={async () => {
+              await saveTrial({ ...trial, archived: true });
+              router.push('/');
+            }}
+          />
+        </div>
       )}
 
       <Disclaimer />
