@@ -4,6 +4,8 @@ Verdict helps people find out whether a skincare product is really improving the
 
 Verdict is a mobile-first web app built for the YouCam API Skin AI & eCommerce VTO Hackathon (Skin AI track).
 
+**Live demo:** https://verdict-delta-seven.vercel.app (open it on a phone; tap "View sample journey" to see a full six-week trial without scanning).
+
 > Verdict provides cosmetic insight. It is not medical advice.
 
 ![Verdict compares repeated YouCam skin scans and says whether a product is working](docs/screenshots/gallery-1-verdict.png)

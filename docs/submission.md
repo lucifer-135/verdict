@@ -90,8 +90,8 @@ Single phone screens are in `docs/screenshots/phone/` if you want more images.
 
 ### "Try it out" links
 
-- `<GitHub repository URL>`
-- `<Vercel live demo URL>`
+- `https://github.com/lucifer-135/verdict`
+- `https://verdict-delta-seven.vercel.app`
 
 ### Video demo link
 
@@ -129,7 +129,7 @@ For consumers, the value is fewer wasted purchases and less guesswork. People ma
 
 ### URL to the code repository for judging and testing
 
-`<GitHub repository URL>` (public, MIT license). The README explains how to run the app with a YouCam API key, or without one in mock mode.
+`https://github.com/lucifer-135/verdict` (public, MIT license). The README explains how to run the app with a YouCam API key, or without one in mock mode.
 
 ### Was there a moment during the hackathon where the API surprised you, in a good or frustrating way?
 
