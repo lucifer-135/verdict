@@ -160,7 +160,7 @@ export default function ShelfPage() {
         <ButtonLink href="/trial/new" variant={hasRealTrial ? 'secondary' : 'primary'} className="w-full">
           Start {hasRealTrial ? 'another' : 'a'} trial
         </ButtonLink>
-        {!trials.some(t => t.isSample) && <SampleButton variant="ghost" />}
+        <SampleButton variant="ghost" />
       </div>
       <Disclaimer />
     </section>
