@@ -11,6 +11,7 @@ import { SampleBadge } from '@/components/SampleBadge';
 import { TrendChart } from '@/components/TrendChart';
 import { ConfirmButton } from '@/components/ConfirmButton';
 import { CostEditor } from '@/components/CostEditor';
+import { ShareButton } from '@/components/ShareButton';
 import { ButtonLink, Card, PageHeader } from '@/components/ui';
 import { saveTrial } from '@/lib/store/db';
 import { VerdictCard } from '@/components/VerdictCard';
@@ -106,6 +107,7 @@ export default function TrialPage() {
           }}
         />
       )}
+      <ShareButton trial={trial} verdict={verdict} />
 
       {!trial.isSample && (
         <ButtonLink href={`/scan?trial=${trial.id}&then=detail`} className="mt-4 w-full">
